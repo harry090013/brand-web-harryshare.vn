@@ -1,8 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
-export default async function Page({params}:{params:{slug:string}}){
-  const { data:p } = await supabase.from("products_affiliate").select("*").eq("slug",params.slug).single();
+export default async function Page({params}:{params:Promise<{slug:string}>}){
+  const { slug } = await params
+  const { data:p } = await supabase.from("products_affiliate").select("*").eq("slug",slug).single();
   if(!p) return <div className="p-12">Không tìm thấy</div>;
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">

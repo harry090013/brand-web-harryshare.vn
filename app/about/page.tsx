@@ -1,7 +1,7 @@
 export default function About() {
   return (
     <div className="bg-[#FAFAFA] min-h-screen py-16">
-      <div className="max-w- mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white border rounded-2xl p-8 md:p-12">
           <h1 className="text-3xl font-bold mb-6">Về Harry Share</h1>
           <div className="prose prose-neutral max-w-none">

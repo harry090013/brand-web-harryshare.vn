@@ -14,7 +14,7 @@ export default function Contact() {
 
   return (
     <div className="bg-[#FAFAFA] min-h-screen py-16">
-      <div className="max-w- mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white border rounded-2xl p-8">
           <h1 className="text-2xl font-bold mb-2">Liên hệ</h1>
           <p className="text-gray-600 mb-6">Có gì muốn nói với mình?</p>

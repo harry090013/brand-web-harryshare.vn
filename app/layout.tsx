@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Thay header cũ bằng Navbar responsive */}
         <Navbar />
 
-        <main className="min-h-">{children}</main>
+        <main className="min-h-screen">{children}</main>
 
         <footer className="border-t mt-20">
           <div className="max-w-6xl mx-auto px-4 py-10 text-sm text-zinc-500">

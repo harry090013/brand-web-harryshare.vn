@@ -19,7 +19,7 @@ export default async function Home() {
   return (
     <main className="bg-white">
       {/* HERO */}
-      <section className="relative h-">
+      <section className="relative h-screen">
         <img
           src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2000"
           alt="Harry Share"
@@ -68,7 +68,7 @@ export default async function Home() {
 
       {/* BÀI VIẾT - KHUNG GIỮA */}
       <section className="bg-[#fafafa] py-16 border-t">
-        <div className="max-w- mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           {/* khung trắng ở giữa */}
           <div className="bg-white border rounded-2xl shadow-sm p-6 md:p-10">
             <h2 className="text-2xl font-bold mb-8 text-center">Bài mới nhất</h2>
