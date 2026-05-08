@@ -18,7 +18,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+    <div className="min-h-screen flex items-center justify-center bg-white">
       <form onSubmit={login} className="bg-white p-8 rounded-2xl border shadow-sm w-full max-w-sm">
         <h1 className="text-xl font-bold mb-6">Đăng nhập Admin</h1>
         <input className="w-full border rounded p-2 mb-3" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />

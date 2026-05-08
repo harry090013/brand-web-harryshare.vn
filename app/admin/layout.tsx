@@ -137,8 +137,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
+      {/* ── Mobile Header ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200/50 z-40 flex items-center justify-between px-4">
+        <Link href="/admin" className="font-[family-name:var(--font-serif)] text-olive font-medium">Harry Share Admin</Link>
+        <LogoutButton />
+      </div>
+
       {/* ── Main Content ── */}
-      <main className="flex-1 md:ml-[240px] xl:ml-[260px] min-h-screen bg-cream-alt/20">
+      <main className="flex-1 md:ml-[240px] xl:ml-[260px] min-h-screen bg-cream-alt mt-14 md:mt-0">
         {children}
       </main>
     </div>

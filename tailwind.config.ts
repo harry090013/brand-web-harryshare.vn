@@ -4,11 +4,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#2563eb",
-        cream: "#F8F7F4",
-        "cream-alt": "#F2F0EA",
-        olive: "#2D372B",
-        sage: "#4A5D4E",
+        primary: "#22c55e",
+        cream: "#FFFFFF",
+        "cream-alt": "#F0FDF4",
+        olive: "#14532D",
+        sage: "#22C55E",
       }
     },
   },

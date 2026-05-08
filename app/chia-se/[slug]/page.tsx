@@ -4,6 +4,7 @@ import Link from 'next/link'
 import ShareBar from './share-bar'
 import LikeButton from './like-button'
 import { marked } from 'marked'
+import CommentBox from '@/components/CommentBox'
 
 export const revalidate = 0
 
@@ -36,9 +37,6 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
 
   if (!post) return notFound()
 
-  // tăng view (không await để load nhanh hơn)
-  supabase.rpc('increment_post_views', { post_id: post.id })
-
   const { data: related } = await supabase
     .from('posts')
     .select('id,title,slug,image,published_at')
@@ -54,7 +52,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
   })
 
   return (
-    <div className="bg-[#FAFAFA] min-h-screen">
+    <div className="bg-white min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-[1fr_320px] gap-10">
         
         <article className="bg-white rounded-2xl border p-6 md:p-8">
@@ -68,8 +66,6 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
           
           <div className="flex items-center gap-3 text-sm text-gray-500 mb-6">
             <span>{new Date(post.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</span>
-            <span>•</span>
-            <span>{post.views || 0} lượt xem</span>
             {post.read_time && (
               <>
                 <span>•</span>
@@ -93,9 +89,14 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
             dangerouslySetInnerHTML={{ __html: html as string }} 
           />
 
-         <div className="mt-10 pt-6 border-t flex items-center justify-between flex-wrap gap-4">
+          <div className="mt-10 pt-6 border-t flex items-center justify-between flex-wrap gap-4">
             <LikeButton postId={post.id} initialLikes={post.likes || 0} />
             <ShareBar title={post.title} slug={post.slug} />
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-gray-100">
+            <h3 className="text-xl font-[family-name:var(--font-serif)] text-olive mb-6">Bình luận</h3>
+            <CommentBox postSlug={post.slug} />
           </div>
         </article>
 

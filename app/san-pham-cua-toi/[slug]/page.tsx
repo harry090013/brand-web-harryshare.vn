@@ -17,7 +17,7 @@ export default async function OwnedProductDetail({ params }: { params: Promise<{
   if (!product) return notFound();
 
   return (
-    <div className="bg-[#FAFAFA] min-h-screen pb-24">
+    <div className="bg-white min-h-screen pb-24">
       {/* Header with Image */}
       <section className="bg-cream border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-4 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">

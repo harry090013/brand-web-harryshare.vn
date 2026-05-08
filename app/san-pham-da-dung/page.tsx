@@ -10,7 +10,7 @@ export default async function AffiliateProductsPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="bg-[#FAFAFA] min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Header Section */}
       <section className="bg-cream border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-4 py-20 text-center">
