@@ -5,6 +5,7 @@ import ShareBar from './share-bar'
 import LikeButton from './like-button'
 import { marked } from 'marked'
 import CommentBox from '@/components/CommentBox'
+import FadeIn from '@/components/FadeIn'
 
 export const revalidate = 0
 
@@ -55,8 +56,9 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
     <div className="bg-white min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-[1fr_320px] gap-10">
         
-        <article className="bg-white rounded-2xl border p-6 md:p-8">
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
+        <FadeIn direction="up">
+          <article className="bg-white rounded-2xl border p-6 md:p-8">
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
             {post.category || 'Chia sẻ'}
           </div>
           
@@ -94,14 +96,16 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
             <ShareBar title={post.title} slug={post.slug} />
           </div>
 
-          <div className="mt-12 pt-8 border-t border-gray-100">
-            <h3 className="text-xl font-[family-name:var(--font-serif)] text-olive mb-6">Bình luận</h3>
-            <CommentBox slug={post.slug} />
-          </div>
-        </article>
+            <div className="mt-12 pt-8 border-t border-gray-100">
+              <h3 className="text-xl font-[family-name:var(--font-serif)] text-olive mb-6">Bình luận</h3>
+              <CommentBox slug={post.slug} />
+            </div>
+          </article>
+        </FadeIn>
 
         <aside className="space-y-6">
-          <div className="bg-white rounded-2xl border p-5">
+          <FadeIn direction="left" delay={200}>
+            <div className="bg-white rounded-2xl border p-5">
             <h3 className="font-semibold mb-4">Đọc tiếp</h3>
             <div className="space-y-4">
               {related?.length ? related.map((r) => (
@@ -117,13 +121,16 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
               )) : (
                 <p className="text-sm text-gray-500">Chưa có bài liên quan</p>
               )}
+              </div>
             </div>
-          </div>
+          </FadeIn>
 
-          <div className="bg-white rounded-2xl border p-5 text-sm text-gray-600">
-            <p>Harry Share — ghi chú nhanh khi làm sản phẩm.</p>
-            <Link href="/chia-se" className="text-blue-600 hover:underline mt-2 inline-block">Xem tất cả bài →</Link>
-          </div>
+          <FadeIn direction="up" delay={300}>
+            <div className="bg-white rounded-2xl border p-5 text-sm text-gray-600">
+              <p>Harry Share — ghi chú nhanh khi làm sản phẩm.</p>
+              <Link href="/chia-se" className="text-blue-600 hover:underline mt-2 inline-block">Xem tất cả bài →</Link>
+            </div>
+          </FadeIn>
         </aside>
       </div>
     </div>

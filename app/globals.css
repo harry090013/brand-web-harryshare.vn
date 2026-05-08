@@ -4,3 +4,18 @@
 
 body { @apply bg-white text-zinc-900 antialiased; }
 .prose img { @apply rounded-xl; }
+
+@keyframes page-transition {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-in {
+  animation: page-transition 1.2s ease-out forwards;
+}
