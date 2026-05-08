@@ -36,8 +36,8 @@ export const metadata = {
     description: 'Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ Harry.',
   },
   icons: {
-    icon: '/icon.png',
-    apple: '/icon.png',
+    icon: '/icon.jpg',
+    apple: '/icon.jpg',
   }
 }
 
