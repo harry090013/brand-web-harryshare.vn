@@ -11,9 +11,16 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
+  // Fetch categories from DB
+  const { data: catData } = await supabase.from('categories').select('name,slug').order('created_at', { ascending: true })
+  const tabs = [
+    { key: 'all', label: 'Tất cả' },
+    ...(catData || []).map(c => ({ key: c.slug, label: c.name }))
+  ]
+
   let query = supabase
     .from('posts')
-    .select('id,title,slug,image,excerpt,published_at,category,views', { count: 'exact' })
+    .select('id,title,slug,image,excerpt,published_at,category,likes', { count: 'exact' })
     .eq('published', true)
     .order('published_at', { ascending: false })
     .range(from, to)
@@ -24,13 +31,6 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
 
   const { data: posts, count } = await query
   const totalPages = Math.ceil((count || 0) / PAGE_SIZE)
-
-  const tabs = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'Chia sẻ', label: 'Chia sẻ' },
-    { key: 'Đã dùng', label: 'Sản phẩm mình dùng' },
-    { key: 'Của tôi', label: 'Sản phẩm mình sản xuất' },
-  ]
 
   return (
     <div className="bg-[#FAFAFA] min-h-screen">
@@ -51,22 +51,39 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
           ))}
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts?.map(p => (
-            <Link key={p.id} href={`/chia-se/${p.slug}`} className="group bg-white border rounded-2xl overflow-hidden hover:shadow-sm transition">
-              <div className="aspect-[16/10] bg-gray-100 overflow-hidden">
-                <img src={p.image || 'https://placehold.co/600x375'} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
-              </div>
-              <div className="p-4">
-                <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">{p.category}</div>
-                <h3 className="font-medium leading-snug line-clamp-2 group-hover:underline">{p.title}</h3>
-                <p className="text-xs text-gray-500 mt-2">
-                  {p.published_at && new Date(p.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })} • {p.views || 0} lượt xem
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {posts && posts.length > 0 ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map(p => {
+              const catName = catData?.find(c => c.slug === p.category)?.name || p.category
+              return (
+                <Link key={p.id} href={`/chia-se/${p.slug}`} className="group bg-white border rounded-2xl overflow-hidden hover:shadow-sm transition">
+                  <div className="aspect-[16/10] bg-gray-100 overflow-hidden relative">
+                    {p.image ? (
+                      <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300 group-hover:scale-105 transition duration-500">
+                        <svg className="w-8 h-8 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <div className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{catName}</div>
+                    <h3 className="font-[family-name:var(--font-serif)] text-lg text-olive leading-snug line-clamp-2 group-hover:text-sage transition">{p.title}</h3>
+                    <p className="text-xs text-gray-400 mt-4 flex items-center gap-3">
+                      <span>{p.published_at ? new Date(p.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' }) : 'Vừa xong'}</span>
+                      <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+                      <span className="flex items-center gap-1"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg> {p.likes || 0}</span>
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-20 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">
+            Chưa có bài viết nào trong chuyên mục này.
+          </div>
+        )}
 
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-10">

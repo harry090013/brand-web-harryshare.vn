@@ -5,6 +5,10 @@ const config: Config = {
     extend: {
       colors: {
         primary: "#2563eb",
+        cream: "#F8F7F4",
+        "cream-alt": "#F2F0EA",
+        olive: "#2D372B",
+        sage: "#4A5D4E",
       }
     },
   },

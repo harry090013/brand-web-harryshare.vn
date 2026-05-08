@@ -5,12 +5,12 @@ import { useState } from 'react'
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const links = [
-  { href: '/chia-se', label: 'Chia sẻ' },
-  { href: '/chia-se?cat=Đã%20dùng', label: 'Sản phẩm mình dùng' },
-  { href: '/chia-se?cat=Của%20tôi', label: 'Sản phẩm mình sản xuất' },
-  { href: '/about', label: 'Tôi là Ai' },
-  { href: '/lien-he', label: 'Liên hệ' },
-]
+    { href: '/chia-se', label: 'Chia sẻ' },
+    { href: '/san-pham-cua-toi', label: 'Sản phẩm của tôi' },
+    { href: '/san-pham-da-dung', label: 'Góc Review' },
+    { href: '/about', label: 'Tôi là Ai' },
+    { href: '/lien-he', label: 'Liên hệ' },
+  ]
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b">

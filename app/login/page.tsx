@@ -14,7 +14,7 @@ export default function LoginPage() {
     setErr('')
     const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
     if (error) setErr(error.message)
-    else router.push('/admin')
+    else window.location.href = '/admin' // Force full page load để middleware chạy lại
   }
 
   return (

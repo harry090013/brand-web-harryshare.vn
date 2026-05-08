@@ -1,203 +1,215 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-// Editor chỉ load ở client, có kiểu chuẩn
-const Editor = dynamic(() => import('@/components/TinyEditor'), {
-  ssr: false,
-  loading: () => <div className="p-4 text-sm text-gray-500">Đang tải editor...</div>
-})
-
-const slugify = (str: string) => {
-  return str
-    .toLowerCase()
-    .normalize('NFD')                    // tách dấu: à -> a + ̀
-    .replace(/[\u0300-\u036f]/g, '')     // xóa dấu
-    .replace(/đ/g, 'd')                  // đ -> d
-    .replace(/[^a-z0-9\s-]/g, '')        // bỏ ký tự lạ
-    .trim()
-    .replace(/\s+/g, '-')                // space -> -
-    .replace(/-+/g, '-')                 // -- -> -
-}
-
 type Post = {
-  id?: string; title: string; slug: string; excerpt: string;
-  image: string; content: string; category: string; published: boolean;
+  id: string; title: string; slug: string; category: string; published: boolean;
   published_at?: string | null;
 }
-type Category = { name: string; slug: string }
 
-export default function AdminPage() {
+type Stats = {
+  totalPosts: number
+  publishedPosts: number
+  draftPosts: number
+  totalCategories: number
+  totalProducts: number
+  pendingComments: number
+  totalOrders: number
+}
+
+export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([])
-  const [cats, setCats] = useState<Category[]>([])
-  const [editing, setEditing] = useState<string | null>(null)
-  const [form, setForm] = useState<Post>({ title:'', slug:'', excerpt:'', image:'', content:'', category:'chia-se', published:false, published_at:null })
-  const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-
+  const [stats, setStats] = useState<Stats>({ totalPosts: 0, publishedPosts: 0, draftPosts: 0, totalCategories: 0, totalProducts: 0, pendingComments: 0, totalOrders: 0 })
+  const [loading, setLoading] = useState(true)
+  const [userChecked, setUserChecked] = useState(false)
   const router = useRouter()
-const [userChecked, setUserChecked] = useState(false)
 
-useEffect(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    if (!data.session) router.replace('/login')
-    else setUserChecked(true)
-  })
-}, [router])
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) router.replace('/login')
+      else setUserChecked(true)
+    })
+  }, [router])
 
-  const formRef = useRef(form)
-  useEffect(()=>{ formRef.current = form }, [form])
+  useEffect(() => {
+    if (!userChecked) return
+    const loadAll = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/admin/stats')
+        if (res.status === 401) { router.replace('/login'); return }
+        if (!res.ok) throw new Error('Failed to load stats')
+        const json = await res.json()
+        const p: Post[] = json.posts || []
+        setPosts(p)
+        setStats({
+          totalPosts: p.length,
+          publishedPosts: p.filter(x => x.published).length,
+          draftPosts: p.filter(x => !x.published).length,
+          totalCategories: json.stats?.totalCategories || 0,
+          totalProducts: json.stats?.totalProducts || 0,
+          pendingComments: json.stats?.pendingComments || 0,
+          totalOrders: json.stats?.totalOrders || 0,
+        })
+      } catch (err) {
+        console.error('Admin load error:', err)
+      }
+      setLoading(false)
+    }
+    loadAll()
+  }, [userChecked, router])
 
-  const loadAll = async () => {
-    setLoading(true)
-    const { data: p } = await supabase.from('posts').select('*').order('created_at', { ascending:false })
-    const { data: c } = await supabase.from('categories').select('name,slug').order('name')
-    setPosts(p || [])
-    setCats(c?.length? c : [{name:'Chia sẻ',slug:'chia-se'},{name:'Case study',slug:'case-study'}])
-    setLoading(false)
-  }
-  useEffect(()=>{ loadAll() }, [])
-
-  const selectPost = (p:any) => { setEditing(p.id); setForm({...p, published:!!p.published}) }
-  const newPost = () => { setEditing(null); setForm({ title:'', slug:'', excerpt:'', image:'', content:'', category:'chia-se', published:false, published_at:null }) }
-  const validate = () => { if(!form.title.trim()){alert('Thiếu tiêu đề');return false} if(!form.slug.trim()){alert('Thiếu slug');return false} if(!form.content.trim()){alert('Thiếu nội dung');return false} return true }
-
-  const handleUpload = async (e:React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if(!file) return
-    setUploading(true)
-    const name = `${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi,'-')}`
-    const { error } = await supabase.storage.from('images').upload(name, file)
-    if(error){ alert(error.message); setUploading(false); return }
-    const { data } = supabase.storage.from('images').getPublicUrl(name)
-    setForm(f=>({...f, image:data.publicUrl})); setUploading(false)
-  }
-
-  const savePost = async (silent=false) => {
-    if(!validate()) return
-    const payload = {...form, published_at: form.published? new Date().toISOString() : null}
-    const q = editing? supabase.from('posts').update(payload).eq('id',editing) : supabase.from('posts').insert(payload).select().single()
-    const { data, error } = await q
-    if(error){ if(!silent) alert('LƯU LỖI: '+error.message); return }
-    if(!editing && data) setEditing(data.id)
-    await loadAll(); if(!silent) alert('✓ Đã lưu')
+  if (!userChecked || loading) {
+    return (
+      <div className="p-12 flex items-center justify-center min-h-screen">
+        <div className="text-olive font-[family-name:var(--font-serif)] text-2xl animate-pulse">Đang tải...</div>
+      </div>
+    )
   }
 
-  const duplicatePost = async () => {
-    if(!editing) return
-    const copy = {...form, title:form.title+' (copy)', slug:form.slug+'-copy-'+Date.now(), published:false, published_at:null}
-    const { data } = await supabase.from('posts').insert(copy).select().single()
-    await loadAll(); if(data) selectPost(data)
-  }
-  const deletePost = async () => {
-    if(!editing ||!confirm('Xóa?')) return
-    await supabase.from('posts').delete().eq('id',editing); await loadAll(); newPost()
-  }
-
-  // Auto-save 5s, dùng formRef để không bị ghi đè published
-  useEffect(()=>{
-    if(!editing) return
-    const id = setInterval(async ()=>{
-      const current = formRef.current
-      if(!current.title) return
-      await supabase.from('posts').update({...current, published_at: current.published? new Date().toISOString() : null}).eq('id', editing)
-    }, 5000)
-    return ()=> clearInterval(id)
-  }, [editing])
-
-  if (!userChecked) return <div className="p-10 text-center">Đang kiểm tra...</div>
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
-      <div className="max-w- mx-auto p-4 grid lg:grid-cols-[280px_1fr_380px] gap-4">
-        <div className="bg-white border rounded-xl p-3 h- overflow-auto">
-          <div className="flex justify-between mb-2">
-  <b>Bài viết</b>
-  <div className="flex gap-2">
-    <button onClick={newPost} className="text-xs border px-2 py-1 rounded">+ Mới</button>
-    <button onClick={async()=>{await supabase.auth.signOut(); router.push('/login')}} className="text-xs border px-2 py-1 rounded text-red-600">Thoát</button>
-  </div>
-</div>
-          {loading && <div className="text-xs text-gray-500">Đang tải...</div>}
-          {posts.map(p=>(
-            <div key={p.id} onClick={()=>selectPost(p)} className={`p-2 mb-1 rounded cursor-pointer text-sm ${editing===p.id?'bg-black text-white':'hover:bg-gray-100'}`}>
-              {p.title} <span className="opacity-60">({p.published?'Đã đăng':'Nháp'})</span>
+    <div className="p-8 md:p-12 max-w-6xl mx-auto pb-24 relative">
+
+      {/* ── Header ── */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-12">
+        <div>
+          <h1 className="text-4xl text-olive font-[family-name:var(--font-serif)] mb-1">Digital Sanctuary</h1>
+          <p className="text-gray-500 italic font-[family-name:var(--font-serif)]">Welcome back to your creative center.</p>
+        </div>
+        <Link href="/" target="_blank" className="bg-sage text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-opacity-90 transition inline-flex items-center gap-2 self-start md:self-auto">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+          Xem website
+        </Link>
+      </div>
+
+      {/* ── Quick Actions ── */}
+      <div className="grid md:grid-cols-3 gap-4 mb-10">
+        <Link href="/editor/new" className="bg-cream border border-gray-200/60 rounded-2xl p-6 group hover:shadow-sm hover:bg-white transition block">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-10 h-10 bg-[#AEBFA8]/20 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
             </div>
-          ))}
+            <span className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition text-lg">→</span>
+          </div>
+          <h3 className="text-xl text-olive font-[family-name:var(--font-serif)] mb-1">Viết bài mới</h3>
+          <p className="text-xs text-gray-400 leading-relaxed">Mở editor để bắt đầu viết bài mới.</p>
+        </Link>
+
+        <Link href="/admin/categories" className="bg-cream border border-gray-200/60 rounded-2xl p-6 group hover:shadow-sm hover:bg-white transition block">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-10 h-10 bg-[#AEBFA8]/20 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+            </div>
+            <span className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition text-lg">→</span>
+          </div>
+          <h3 className="text-xl text-olive font-[family-name:var(--font-serif)] mb-1">Danh mục</h3>
+          <p className="text-xs text-gray-400 leading-relaxed">Quản lý {stats.totalCategories} danh mục bài viết.</p>
+        </Link>
+
+        <Link href="/admin/products" className="bg-cream border border-gray-200/60 rounded-2xl p-6 group hover:shadow-sm hover:bg-white transition block">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-10 h-10 bg-[#AEBFA8]/20 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            </div>
+            <span className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition text-lg">→</span>
+          </div>
+          <h3 className="text-xl text-olive font-[family-name:var(--font-serif)] mb-1">Sản phẩm</h3>
+          <p className="text-xs text-gray-400 leading-relaxed">{stats.totalProducts} sản phẩm đang có.</p>
+        </Link>
+      </div>
+
+      {/* ── Stats Row ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        {[
+          { label: 'Bài đã xuất bản', value: stats.publishedPosts, color: 'text-sage' },
+          { label: 'Bản nháp', value: stats.draftPosts, color: 'text-olive' },
+          { label: 'Bình luận chờ duyệt', value: stats.pendingComments, color: 'text-amber-600' },
+          { label: 'Đơn hàng', value: stats.totalOrders, color: 'text-olive' },
+        ].map(stat => (
+          <div key={stat.label} className="bg-white rounded-xl border border-gray-100 shadow-[0_2px_6px_-4px_rgba(0,0,0,0.05)] p-5">
+            <div className={`text-3xl font-[family-name:var(--font-serif)] ${stat.color} mb-1`}>{stat.value}</div>
+            <div className="text-[10px] uppercase tracking-widest text-gray-400">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Recent Entries Table ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
+        <div className="px-6 md:px-8 py-5 flex justify-between items-center border-b border-gray-100">
+          <h2 className="text-xl text-olive font-[family-name:var(--font-serif)]">Bài viết gần đây</h2>
+          <span className="text-[10px] text-gray-400 uppercase tracking-wider">{stats.totalPosts} bài</span>
         </div>
 
-        <div className="bg-white border rounded-xl p-4 h- overflow-auto">
-          <div className="flex justify-between items-center mb-3">
-            <h1 className="font-semibold">{editing?'Cập nhật bài viết':'Bài viết mới'}</h1>
-            <span className="text-xs text-gray-500">Tự động lưu sau 5s</span>
-          </div>
-          <input className="w-full text-2xl font-bold border-0 border-b pb-2 mb-3 focus:outline-none" placeholder="Tiêu đề bài viết" value={form.title} onChange={e=>setForm({...form, title:e.target.value, slug: editing? form.slug : slugify(e.target.value)})}/>
-
-          <div className="mb-4">
-            <label className="text-sm font-medium">Tóm tắt</label>
-            <textarea className="w-full mt-1 border rounded p-2 h-20 text-sm" value={form.excerpt} onChange={e=>setForm({...form, excerpt:e.target.value})}/>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Nội dung</label>
-            <Editor
-              key={editing || 'new'}
-              apiKey="9i9hfqwabe50l20qj1sdwvnk3wxh7bzbxhl0e0dp4e5u8m2g"
-              initialValue={form.content}
-              onEditorChange={(html: string)=> setForm(f=>({...f, content: html}))}
-              init={{
-                height: 520,
-                menubar: false,
-                plugins: 'image link lists table code fullscreen wordcount',
-                toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | removeformat code fullscreen',
-                images_upload_handler: async (blobInfo: any) => {
-                  const file = blobInfo.blob()
-                  const name = `${Date.now()}-${blobInfo.filename()}`
-                  const { error } = await supabase.storage.from('images').upload(name, file)
-                  if(error) throw new Error(error.message)
-                  const { data } = supabase.storage.from('images').getPublicUrl(name)
-                  return data.publicUrl
-                },
-                content_style: 'body{font-family:Inter,sans-serif;font-size:15px;line-height:1.7} img{max-width:100%;height:auto;border-radius:8px}'
-              }}
-            />
-          </div>
-
-          <div className="flex gap-2 mt-4">
-            <button onClick={()=>savePost()} className="px-4 py-2 bg-blue-600 text-white rounded text-sm">Lưu</button>
-            {editing && <><button onClick={duplicatePost} className="px-3 py-2 border rounded text-sm">Nhân bản</button><button onClick={deletePost} className="px-3 py-2 border border-red-300 text-red-600 rounded text-sm">Xóa</button></>}
-          </div>
-        </div>
-
-        <div className="space-y-4 h- overflow-auto">
-          <div className="bg-white border rounded-xl p-4">
-            <h3 className="font-medium mb-2">Thông tin khác</h3>
-            <label className="text-xs">Liên kết</label>
-            <input className="w-full border rounded p-2 text-xs mb-2" value={`https://yourdomain.com/chia-se/${form.slug}`} readOnly/>
-            <label className="text-xs">Slug (tự động)</label>
-<input 
-  className="w-full border rounded p-2 text-xs mb-2 font-mono" 
-  value={form.slug} 
-  onChange={e=>setForm({...form, slug: slugify(e.target.value)})}
-/>
-            
-            <label className="text-xs">Danh mục</label>
-            <select value={form.category} onChange={e=>setForm({...form,category:e.target.value})} className="w-full border rounded p-2 text-sm mb-3">
-              {cats.map(c=><option key={c.slug} value={c.slug}>{c.name}</option>)}
-            </select>
-            <label className="flex items-center gap-2 text-sm mb-3">
-              <input type="checkbox" checked={form.published} onChange={e=>setForm({...form, published: e.target.checked})}/>
-              Xuất bản ngay
-            </label>
-            <label className="text-xs">Ảnh đại diện</label>
-            <div className="flex gap-2">
-              <input className="flex-1 border rounded p-2 text-xs" value={form.image} onChange={e=>setForm({...form,image:e.target.value})}/>
-              <label className="px-2 py-1 border rounded text-xs cursor-pointer">{uploading?'...':'Chọn'}<input type="file" hidden onChange={handleUpload}/></label>
-            </div>
-            {form.image && <img src={form.image} className="mt-2 rounded border h-24 object-cover w-full"/>}
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-[#FAFAF9] text-[9px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                <th className="px-6 py-3 font-medium">Tiêu đề</th>
+                <th className="px-4 py-3 font-medium">Danh mục</th>
+                <th className="px-4 py-3 font-medium">Trạng thái</th>
+                <th className="px-4 py-3 font-medium">Ngày đăng</th>
+                <th className="px-4 py-3 font-medium text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {posts.map(post => (
+                <tr key={post.id} className="border-b border-gray-50 hover:bg-gray-50/40 transition group">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-olive text-sm max-w-xs truncate">{post.title}</div>
+                    <div className="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-xs">/chia-se/{post.slug}</div>
+                  </td>
+                  <td className="px-4 py-4 text-xs text-gray-500">{post.category || '—'}</td>
+                  <td className="px-4 py-4">
+                    <span className={`inline-block px-2.5 py-1 rounded-full text-[9px] font-medium uppercase tracking-wide ${
+                      post.published ? 'bg-[#E8F0E4] text-sage' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {post.published ? 'Đã xuất bản' : 'Nháp'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-xs text-gray-500 whitespace-nowrap">
+                    {post.published_at
+                      ? new Date(post.published_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                      : '—'
+                    }
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                      {post.published && (
+                        <Link href={`/chia-se/${post.slug}`} target="_blank"
+                          className="p-1.5 text-gray-400 hover:text-sage rounded transition" title="Xem bài viết">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </Link>
+                      )}
+                      <Link href={`/editor/${post.id}`}
+                        className="p-1.5 text-gray-400 hover:text-olive rounded transition" title="Chỉnh sửa">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {posts.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-400">
+                    Chưa có bài viết nào. <Link href="/editor/new" className="text-sage hover:underline">Viết bài đầu tiên →</Link>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
+
+      {/* ── Floating Add Button ── */}
+      <Link href="/editor/new"
+        className="fixed bottom-8 right-8 w-14 h-14 bg-sage text-white rounded-full flex items-center justify-center shadow-lg hover:bg-olive transition hover:scale-105 z-50"
+        title="Viết bài mới">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </Link>
     </div>
   )
 }

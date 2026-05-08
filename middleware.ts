@@ -26,9 +26,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Chặn /editor nếu chưa login
+  if (request.nextUrl.pathname.startsWith('/editor') && !session) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Chặn /api/admin nếu chưa login
+  if (request.nextUrl.pathname.startsWith('/api/admin') && !session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   return response
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/editor/:path*', '/api/admin/:path*'],
 }
