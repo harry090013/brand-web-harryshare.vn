@@ -16,8 +16,29 @@ const playfair = Playfair_Display({
 })
 
 export const metadata = {
-  title: 'Harry Share - Xây dựng thương hiệu cá nhân',
-  description: 'Marketer chia sẻ góc nhìn, review sản phẩm và dịch vụ tư vấn thương hiệu cá nhân',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://harryshare.vn'),
+  title: {
+    default: 'Harry Share | Tư duy Sản phẩm & Thương hiệu',
+    template: '%s | Harry Share'
+  },
+  description: 'Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ Harry.',
+  openGraph: {
+    title: 'Harry Share | Tư duy Sản phẩm & Thương hiệu',
+    description: 'Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ Harry.',
+    url: 'https://harryshare.vn',
+    siteName: 'Harry Share',
+    locale: 'vi_VN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Harry Share | Tư duy Sản phẩm & Thương hiệu',
+    description: 'Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ Harry.',
+  },
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  }
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
