@@ -96,7 +96,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
 
           <div className="mt-12 pt-8 border-t border-gray-100">
             <h3 className="text-xl font-[family-name:var(--font-serif)] text-olive mb-6">Bình luận</h3>
-            <CommentBox postSlug={post.slug} />
+            <CommentBox slug={post.slug} />
           </div>
         </article>
 
