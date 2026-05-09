@@ -36,7 +36,7 @@ export default async function Home() {
       <section className="max-w-6xl mx-auto px-4 pt-32 pb-24 grid md:grid-cols-2 gap-12 items-center">
         <FadeIn direction="right" delay={100}>
           <div className="max-w-xl">
-            <p className="uppercase tracking-widest text-[10px] md:text-xs mb-6 text-gray-500 font-medium">Quang Hiếu • Duy Xuyên, Quảng Nam</p>
+            <p className="uppercase tracking-widest text-[10px] md:text-xs mb-6 text-gray-500 font-medium">Quang Hiếu • Duy Xuyên, Đà Nẵng</p>
             <h1 className="text-5xl md:text-6xl lg:text-7xl leading-tight text-olive font-[family-name:var(--font-serif)]">
               Những điều mình<br />học được khi làm<br /><span className="italic text-sage">sản phẩm.</span>
             </h1>
@@ -136,7 +136,7 @@ export default async function Home() {
               "Không dạy đời, chỉ ghi lại hành trình. Vì sự chân thật luôn có sức mạnh lan tỏa bền vững nhất."
             </h2>
             <p className="mt-8 text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Mình là Quang Hiếu, một người làm content và sản phẩm số từ Quảng Nam. Mình tin vào sự phát triển chậm rãi, những thành quả nhỏ bé nhưng thiết thực.
+              Mình là Quang Hiếu, một người làm content và sản phẩm số từ Đà Nẵng. Mình tin vào sự phát triển chậm rãi, những thành quả nhỏ bé nhưng thiết thực.
             </p>
             <div className="mt-10">
               <Link href="/about" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium hover:text-sage transition">
@@ -182,20 +182,20 @@ export default async function Home() {
         <FadeIn direction="up">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-gray-200">
             <div className="text-center px-4">
-              <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">3 năm</div>
-              <div className="text-xs uppercase tracking-widest text-gray-500">POD & SP số</div>
+              <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">4 năm</div>
+              <div className="text-xs uppercase tracking-widest text-gray-500">Lăn lộn thực tế</div>
             </div>
             <div className="text-center px-4">
-              <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">47</div>
-              <div className="text-xs uppercase tracking-widest text-gray-500">Sản phẩm</div>
+              <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">34k</div>
+              <div className="text-xs uppercase tracking-widest text-gray-500">Chi phí 1 Lead Spa</div>
             </div>
             <div className="text-center px-4">
-              <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">0đ</div>
-              <div className="text-xs uppercase tracking-widest text-gray-500">Ads đơn đầu</div>
+              <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">5+</div>
+              <div className="text-xs uppercase tracking-widest text-gray-500">Kênh truyền thông</div>
             </div>
             <div className="text-center px-4">
               <div className="text-4xl font-[family-name:var(--font-serif)] text-olive mb-2">1</div>
-              <div className="text-xs uppercase tracking-widest text-gray-500">Nguyên tắc: Thật</div>
+              <div className="text-xs uppercase tracking-widest text-gray-500">Nguyên tắc: Ghi thật</div>
             </div>
           </div>
         </FadeIn>

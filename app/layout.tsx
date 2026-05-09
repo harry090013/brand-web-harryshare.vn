@@ -97,7 +97,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 {/* Bottom bar */}
                 <div className="border-t border-gray-100 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="text-xs text-gray-400">
-                    © {new Date().getFullYear()} Harry Share. Đã đăng ký bản quyền.
+                    © {new Date().getFullYear()} Harry Share.
                   </div>
                   <div className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">
                     Design by <span className="text-sage font-bold">Harry!</span>

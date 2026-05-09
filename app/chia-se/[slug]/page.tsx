@@ -47,10 +47,10 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
     .order('published_at', { ascending: false })
     .limit(3)
 
-  const html = marked.parse(post.content || '', {
-    breaks: true,
-    gfm: true,
-  })
+  // content_html = HTML từ TinyMCE editor, content = markdown (legacy)
+  const html = post.content_html
+    ? post.content_html
+    : marked.parse(post.content || '', { breaks: true, gfm: true })
 
   return (
     <div className="bg-white min-h-screen">
