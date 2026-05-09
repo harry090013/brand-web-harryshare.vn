@@ -12,10 +12,10 @@ export default function About() {
       <section className="max-w-4xl mx-auto px-4 mb-24 md:mb-32">
         <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium mb-6">Ghi cho mình</p>
         <h1 className="text-5xl md:text-6xl lg:text-7xl leading-tight text-olive font-[family-name:var(--font-serif)] mb-8">
-          Mình ghi lại để <br className="hidden md:block"/><span className="italic text-sage">sau này mình đọc.</span>
+          Mình ghi lại để <br/><span className="italic text-sage">sau này mình đọc.</span>
         </h1>
         <p className="text-lg text-gray-600 leading-relaxed max-w-2xl">
-          Harry Share không phải chỗ dạy đời. Mình là Quang Hiếu, mọi người hay gọi Harry, dân IT tốt nghiệp 07/2022 ở Đà Nẵng. Mình đã thử qua đủ nghề: phục vụ, bếp chay, code freelance, MC đoàn xã, sale thảo mộc, marketing spa. Ở đây mình chỉ ghi thật những gì mình làm, mình sai, mình học.
+          Harry Share không phải chỗ dạy đời. Mình là Quang Hiếu, mọi người hay gọi Harry, dân IT tốt nghiệp 07/2022 ở Đà Nẵng. Mình đã thử qua đủ nghề: phục vụ, bếp chay, code freelance, quản trò sinh hoạt Đoàn Thanh Niên, sale thảo mộc, marketing spa. Ở đây mình chỉ ghi thật những gì mình làm, mình sai, mình học.
         </p>
       </section>
 

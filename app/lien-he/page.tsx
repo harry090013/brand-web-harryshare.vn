@@ -6,9 +6,14 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [sent, setSent] = useState(false)
 
+  const [sending, setSending] = useState(false)
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await supabase.from('contacts').insert(form)
+    setSending(true)
+    const { error } = await supabase.from('contacts').insert({ ...form, read: false })
+    setSending(false)
+    if (error) { alert('Gửi thất bại: ' + error.message); return }
     setSent(true)
   }
 
