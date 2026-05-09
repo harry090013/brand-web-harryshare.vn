@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'Tôi là ai - Harry Share',
-  description: 'Câu chuyện về Quang Hiếu và hành trình xây dựng sản phẩm.',
+  description: 'Mình là Quang Hiếu (Harry). Ghi lại những gì mình làm, mình sai, mình học.',
 }
 
 export default function About() {
@@ -10,12 +10,12 @@ export default function About() {
     <div className="bg-cream min-h-screen pt-32 pb-24">
       {/* SECTION 1: HEADER */}
       <section className="max-w-4xl mx-auto px-4 mb-24 md:mb-32">
-        <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium mb-6">Triết lý sống</p>
+        <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium mb-6">Ghi cho mình</p>
         <h1 className="text-5xl md:text-6xl lg:text-7xl leading-tight text-olive font-[family-name:var(--font-serif)] mb-8">
-          Sống và làm việc với <br className="hidden md:block"/><span className="italic text-sage">sự tỉnh thức.</span>
+          Mình ghi lại để <br className="hidden md:block"/><span className="italic text-sage">sau này mình đọc.</span>
         </h1>
         <p className="text-lg text-gray-600 leading-relaxed max-w-2xl">
-          Harry Share là nơi ghi chép lại hành trình làm sản phẩm. Không ồn ào, tập trung vào giá trị thực cốt lõi thay vì chạy đua theo số lượng hay những chiêu trò hào nhoáng.
+          Harry Share không phải chỗ dạy đời. Mình là Quang Hiếu, mọi người hay gọi Harry, dân IT tốt nghiệp 07/2022 ở Đà Nẵng. Mình đã thử qua đủ nghề: phục vụ, bếp chay, code freelance, MC đoàn xã, sale thảo mộc, marketing spa. Ở đây mình chỉ ghi thật những gì mình làm, mình sai, mình học.
         </p>
       </section>
 
@@ -24,24 +24,24 @@ export default function About() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="order-2 md:order-1 relative aspect-[3/4] md:aspect-[4/5] rounded-xl overflow-hidden shadow-sm">
             <img 
-              src="https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=800" 
-              alt="Chân dung Quang Hiếu" 
+              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800" 
+              alt="Harry đứng ở biển" 
               className="w-full h-full object-cover"
             />
           </div>
           <div className="order-1 md:order-2">
             <h2 className="text-3xl md:text-4xl text-olive font-[family-name:var(--font-serif)] mb-6">
-              Câu chuyện bắt đầu từ sự tĩnh lặng.
+              Câu chuyện bắt đầu khi mình chán ngồi code.
             </h2>
             <div className="space-y-6 text-gray-600 leading-relaxed">
               <p>
-                Mình là Harry (Quang Hiếu). Hành trình của mình bắt đầu từ những xô bồ của việc chạy theo số đông. Sau 3 năm làm marketing và xây dựng sản phẩm số, mình nhận ra điều quan trọng nhất thường bị bỏ quên khi ta cố gắng xuất hiện ở mọi nơi cùng một lúc.
+                Mình sinh ở Duy Xuyên, Đà Nẵng. Học xong Công nghệ phần mềm, mình làm front-end React 6 tháng rồi đau lưng, chán ngồi một chỗ. Mình nghỉ.
               </p>
               <p>
-                Mình quyết định chậm lại, rời xa những ồn ào để tập trung vào những điều thiết yếu. Mình viết trang blog này không phải để dạy ai, mà để ghi lại những gì mình học được khi tự tay làm sản phẩm.
+                Sau đó mình đi thử: 1 năm làm hoạt náo đoàn xã Duy Sơn (làm 3 website, nhận 3 giấy khen), 3 tháng tự làm Thảo Mộc Hương T&T, 2 tháng quản lý quán chay Ưu Đàm, 2 tháng tư vấn phần mềm, 3 tháng sale Vương Ngọc Vegan, 3 tháng phục vụ Rex Hotel, rồi 6 tháng làm trưởng phòng marketing ở Tâm An Spa.
               </p>
               <p>
-                Đây không phải là câu chuyện về việc làm ít đi, mà là làm những điều thực sự có ý nghĩa với một sự tập trung tuyệt đối.
+                Mình quyết định chậm lại. 2025 mình mua iPad để đi, 2026 mình build PC để ngồi. Đi để mở mắt, ngồi để làm sâu. Blog này mình viết không phải để chỉ ai, mà để sau này mình không quên mình đã nghĩ gì.
               </p>
             </div>
           </div>
@@ -58,9 +58,9 @@ export default function About() {
             </svg>
           </div>
           <h2 className="text-2xl md:text-4xl leading-relaxed text-olive font-[family-name:var(--font-serif)] italic mb-8">
-            "Chất lượng của sự chú tâm quyết định <br className="hidden md:block"/>chất lượng của cuộc sống."
+            "Cái gì giải quyết được bằng tiền <br className="hidden md:block"/>thì không phải là vấn đề. Mình ghi ra để nhớ <br className="hidden md:block"/>đừng để tiền làm mình mất bình tĩnh."
           </h2>
-          <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium">Harry Share</p>
+          <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium">Harry</p>
         </div>
       </section>
 
@@ -68,17 +68,17 @@ export default function About() {
       <section className="max-w-6xl mx-auto px-4 mb-32">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
-            <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium mb-4">Góc nhìn</p>
+            <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium mb-4">Cách mình chọn</p>
             <h2 className="text-3xl md:text-4xl text-olive font-[family-name:var(--font-serif)] mb-6">
-              Sự chọn lọc khắt khe.
+              Mình chọn kỹ, vì thời gian có hạn.
             </h2>
             <p className="text-gray-600 leading-relaxed mb-8">
-              Mình là người thích lưu giữ và chọn lọc. Mỗi công cụ được giới thiệu, mỗi khóa học được chia sẻ, và mỗi bài viết đều phải trả lời được câu hỏi: Nó có mang lại giá trị thực, và có tôn trọng thời gian của người đọc không?
+              Mình từng ôm nhiều việc rồi kiệt sức. Giờ mỗi bài viết, mỗi tool mình chia sẻ đều phải trả lời được: nó có thật không, và nó có giúp mình ngày mai đỡ sai hơn không.
             </p>
             <div className="flex flex-wrap gap-3">
-              <span className="bg-gray-200/50 text-gray-600 text-[10px] uppercase tracking-widest px-4 py-2 rounded-full font-medium">Tối giản</span>
+              <span className="bg-gray-200/50 text-gray-600 text-[10px] uppercase tracking-widest px-4 py-2 rounded-full font-medium">Thật</span>
               <span className="bg-gray-200/50 text-gray-600 text-[10px] uppercase tracking-widest px-4 py-2 rounded-full font-medium">Thực chiến</span>
-              <span className="bg-gray-200/50 text-gray-600 text-[10px] uppercase tracking-widest px-4 py-2 rounded-full font-medium">Chậm rãi</span>
+              <span className="bg-gray-200/50 text-gray-600 text-[10px] uppercase tracking-widest px-4 py-2 rounded-full font-medium">Chọn lọc</span>
             </div>
           </div>
           <div className="relative aspect-[16/10] rounded-xl overflow-hidden shadow-sm">
@@ -97,19 +97,19 @@ export default function About() {
           <div className="bg-white p-10 md:p-12 rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100">
             <h3 className="text-2xl text-olive font-[family-name:var(--font-serif)] mb-4">Chia sẻ</h3>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Những cách làm, sai lầm, và bài học đắt giá mình rút ra sau nhiều lần thất bại. Mình tin rằng những chia sẻ chân thật nhất luôn có sức lan tỏa mạnh mẽ.
+              Những lần mình làm sai, làm ẩu, và bài học rút ra sau đó. Mình viết cho mình, ai đọc ké thì đọc.
             </p>
           </div>
           <div className="bg-white p-10 md:p-12 rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100">
             <h3 className="text-2xl text-olive font-[family-name:var(--font-serif)] mb-4">Đã dùng</h3>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Review trung thực về những công cụ (tools), sách, và khóa học mà mình đã trực tiếp bỏ tiền ra trải nghiệm và áp dụng vào công việc.
+              Notion, Slack, CapCut, Canva, Photoshop, Trello, AI tools... Mình không review như chuyên gia, mình kể mình dùng thấy sao.
             </p>
           </div>
           <div className="bg-white p-10 md:p-12 rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100">
             <h3 className="text-2xl text-olive font-[family-name:var(--font-serif)] mb-4">Của tôi</h3>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Nơi giới thiệu những sản phẩm số (digital products) mà chính tay mình đang xây dựng, với sự chăm chút và hoàn thiện không ngừng.
+              Mấy thứ mình tự tay làm: website đoàn xã, kênh TikTok bán 300 đơn vegan, chiến dịch spa 34k/tin nhắn. Chưa lớn, nhưng thật.
             </p>
           </div>
         </div>
