@@ -44,9 +44,8 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
               <Link
                 key={t.key}
                 href={`/chia-se?cat=${encodeURIComponent(t.key)}`}
-                className={`px-4 py-1.5 rounded-full border text-sm ${
-                  cat === t.key ? 'bg-black text-white border-black' : 'bg-white hover:bg-gray-50'
-                }`}
+                className={`px-4 py-1.5 rounded-full border text-sm ${cat === t.key ? 'bg-black text-white border-black' : 'bg-white hover:bg-gray-50'
+                  }`}
               >
                 {t.label}
               </Link>
@@ -98,9 +97,8 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
                 <Link
                   key={p}
                   href={`/chia-se?cat=${encodeURIComponent(cat)}&page=${p}`}
-                  className={`w-9 h-9 grid place-items-center rounded-lg border text-sm ${
-                    p === page ? 'bg-black text-white border-black' : 'bg-white hover:bg-gray-50'
-                  }`}
+                  className={`w-9 h-9 grid place-items-center rounded-lg border text-sm ${p === page ? 'bg-black text-white border-black' : 'bg-white hover:bg-gray-50'
+                    }`}
                 >
                   {p}
                 </Link>

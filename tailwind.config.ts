@@ -5,7 +5,7 @@ const config: Config = {
     extend: {
       colors: {
         primary: "#22c55e",
-        cream: "#FFFFFF",
+        cream: "#FCFBF9",
         "cream-alt": "#F0FDF4",
         olive: "#14532D",
         sage: "#22C55E",

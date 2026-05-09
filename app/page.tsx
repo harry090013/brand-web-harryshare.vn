@@ -6,16 +6,16 @@ export const revalidate = 60
 
 export default async function Home() {
   const { data: posts } = await supabase
-   .from('posts')
-   .select('id,title,slug,excerpt,image,published_at,created_at')
-   .eq('published', true)
-   .order('created_at', { ascending: false })
-   .limit(6)
+    .from('posts')
+    .select('id,title,slug,excerpt,image,published_at,created_at')
+    .eq('published', true)
+    .order('created_at', { ascending: false })
+    .limit(6)
 
   const { data: categories } = await supabase
-   .from('categories')
-   .select('name,slug,description')
-   .limit(3)
+    .from('categories')
+    .select('name,slug,description')
+    .limit(3)
 
   // Fallback nếu chưa có categories trong DB
   const cats = categories?.length ? categories : [
@@ -38,7 +38,7 @@ export default async function Home() {
           <div className="max-w-xl">
             <p className="uppercase tracking-widest text-[10px] md:text-xs mb-6 text-gray-500 font-medium">Quang Hiếu • Duy Xuyên, Quảng Nam</p>
             <h1 className="text-5xl md:text-6xl lg:text-7xl leading-tight text-olive font-[family-name:var(--font-serif)]">
-              Những điều mình<br/>học được khi làm<br/><span className="italic text-sage">sản phẩm.</span>
+              Những điều mình<br />học được khi làm<br /><span className="italic text-sage">sản phẩm.</span>
             </h1>
             <p className="mt-8 text-lg text-gray-600 leading-relaxed">
               Không màu mè. Viết cho chính mình của sau này. Từng phục vụ bàn → POD → code freelance. Giờ làm content.
@@ -53,7 +53,7 @@ export default async function Home() {
             </div>
           </div>
         </FadeIn>
-        
+
         <FadeIn direction="left" delay={300}>
           <div className="relative h-[600px] rounded-sm overflow-hidden shadow-sm">
             <img
@@ -89,7 +89,7 @@ export default async function Home() {
                     <img src={posts[0].image || 'https://placehold.co/800x450?text=Harry+Share'} alt={posts[0].title} className="w-full aspect-[4/3] object-cover transition duration-700 group-hover:scale-105" />
                   </div>
                   <div className="text-xs text-gray-500 uppercase tracking-widest mb-3">
-                    {posts[0].published_at ? new Date(posts[0].published_at).toLocaleDateString('vi-VN') : new Date(posts[0].created_at).toLocaleDateString('vi-VN')} • {Math.ceil((posts[0].excerpt?.length || 0)/500) || 3} phút
+                    {posts[0].published_at ? new Date(posts[0].published_at).toLocaleDateString('vi-VN') : new Date(posts[0].created_at).toLocaleDateString('vi-VN')} • {Math.ceil((posts[0].excerpt?.length || 0) / 500) || 3} phút
                   </div>
                   <h3 className="text-2xl md:text-3xl font-[family-name:var(--font-serif)] text-olive leading-tight mb-3 group-hover:text-sage transition">
                     {posts[0].title}
@@ -207,7 +207,7 @@ export default async function Home() {
           <div className="bg-cream-alt rounded-3xl p-12 md:p-20 text-center border border-gray-200/50">
             <p className="uppercase tracking-widest text-[10px] text-gray-500 font-medium mb-4">Newsletter (2 tuần/lần)</p>
             <h2 className="text-3xl md:text-4xl text-olive font-[family-name:var(--font-serif)] mb-4">
-              Góc nhỏ cho một đời sống số <br/><span className="italic">bình tĩnh</span> hơn.
+              Góc nhỏ cho một đời sống số <br /><span className="italic">bình tĩnh</span> hơn.
             </h2>
             <p className="text-gray-600 text-sm max-w-md mx-auto mb-10">
               Tham gia cùng mọi người để nhận bài viết mới nhất. Mình chỉ gửi email khi có bài thật sự đáng đọc.

@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  
+
   const { data: post } = await supabase
     .from('posts')
     .select('*')
@@ -55,46 +55,46 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-[1fr_320px] gap-10">
-        
+
         <FadeIn direction="up">
           <article className="bg-white rounded-2xl border p-6 md:p-8">
             <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
-            {post.category || 'Chia sẻ'}
-          </div>
-          
-          <h1 className="text-2xl md:text-3xl font-bold leading-snug mb-3">
-            {post.title}
-          </h1>
-          
-          <div className="flex items-center gap-3 text-sm text-gray-500 mb-6">
-            <span>{new Date(post.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</span>
-            {post.read_time && (
-              <>
-                <span>•</span>
-                <span>{post.read_time} phút đọc</span>
-              </>
-            )}
-          </div>
-
-          {post.image && (
-            <div className="mb-8 overflow-hidden rounded-xl">
-              <img src={post.image} alt={post.title} className="w-full h-auto" />
+              {post.category || 'Chia sẻ'}
             </div>
-          )}
 
-          {post.excerpt && (
-            <p className="text-gray-700 italic border-l-4 pl-4 mb-6">{post.excerpt}</p>
-          )}
+            <h1 className="text-2xl md:text-3xl font-bold leading-snug mb-3">
+              {post.title}
+            </h1>
 
-          <div 
-            className="prose prose-neutral max-w-none prose-img:rounded-xl prose-a:text-blue-600 prose-headings:font-semibold prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic"
-            dangerouslySetInnerHTML={{ __html: html as string }} 
-          />
+            <div className="flex items-center gap-3 text-sm text-gray-500 mb-6">
+              <span>{new Date(post.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</span>
+              {post.read_time && (
+                <>
+                  <span>•</span>
+                  <span>{post.read_time} phút đọc</span>
+                </>
+              )}
+            </div>
 
-          <div className="mt-10 pt-6 border-t flex items-center justify-between flex-wrap gap-4">
-            <LikeButton postId={post.id} initialLikes={post.likes || 0} />
-            <ShareBar title={post.title} slug={post.slug} />
-          </div>
+            {post.image && (
+              <div className="mb-8 overflow-hidden rounded-xl">
+                <img src={post.image} alt={post.title} className="w-full h-auto" />
+              </div>
+            )}
+
+            {post.excerpt && (
+              <p className="text-gray-700 italic border-l-4 pl-4 mb-6">{post.excerpt}</p>
+            )}
+
+            <div
+              className="prose prose-neutral max-w-none prose-img:rounded-xl prose-a:text-blue-600 prose-headings:font-semibold prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic"
+              dangerouslySetInnerHTML={{ __html: html as string }}
+            />
+
+            <div className="mt-10 pt-6 border-t flex items-center justify-between flex-wrap gap-4">
+              <LikeButton postId={post.id} initialLikes={post.likes || 0} />
+              <ShareBar title={post.title} slug={post.slug} />
+            </div>
 
             <div className="mt-12 pt-8 border-t border-gray-100">
               <h3 className="text-xl font-[family-name:var(--font-serif)] text-olive mb-6">Bình luận</h3>
@@ -106,21 +106,21 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
         <aside className="space-y-6">
           <FadeIn direction="left" delay={200}>
             <div className="bg-white rounded-2xl border p-5">
-            <h3 className="font-semibold mb-4">Đọc tiếp</h3>
-            <div className="space-y-4">
-              {related?.length ? related.map((r) => (
-                <Link key={r.id} href={`/chia-se/${r.slug}`} className="flex gap-3 group">
-                  <div className="w-20 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={r.image || 'https://placehold.co/160x128'} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium leading-snug line-clamp-2 group-hover:underline">{r.title}</h4>
-                    <p className="text-xs text-gray-500 mt-1">{new Date(r.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</p>
-                  </div>
-                </Link>
-              )) : (
-                <p className="text-sm text-gray-500">Chưa có bài liên quan</p>
-              )}
+              <h3 className="font-semibold mb-4">Đọc tiếp</h3>
+              <div className="space-y-4">
+                {related?.length ? related.map((r) => (
+                  <Link key={r.id} href={`/chia-se/${r.slug}`} className="flex gap-3 group">
+                    <div className="w-20 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      <img src={r.image || 'https://placehold.co/160x128'} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium leading-snug line-clamp-2 group-hover:underline">{r.title}</h4>
+                      <p className="text-xs text-gray-500 mt-1">{new Date(r.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</p>
+                    </div>
+                  </Link>
+                )) : (
+                  <p className="text-sm text-gray-500">Chưa có bài liên quan</p>
+                )}
               </div>
             </div>
           </FadeIn>

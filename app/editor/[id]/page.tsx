@@ -30,6 +30,15 @@ type Post = {
   published_at?: string | null
 }
 
+type PostListItem = {
+  id: string
+  title: string
+  slug: string
+  category: string
+  published: boolean
+  updated_at?: string | null
+}
+
 const emptyPost: Post = {
   title: '', slug: '', excerpt: '', image: '',
   content_html: '', category: '', published: false, published_at: null
@@ -38,7 +47,10 @@ const emptyPost: Post = {
 export default function FullscreenEditor() {
   const params = useParams()
   const router = useRouter()
-  const postId = params.id === 'new' ? null : params.id as string
+  const rawId = params?.id
+  const postId = rawId === 'new' ? null : (typeof rawId === 'string' ? rawId : null)
+
+
 
   const [form, setForm] = useState<Post>(emptyPost)
   const [loading, setLoading] = useState(true)
@@ -46,6 +58,9 @@ export default function FullscreenEditor() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [cats, setCats] = useState<{ name: string; slug: string }[]>([])
   const [wordCount, setWordCount] = useState(0)
+  const [allPosts, setAllPosts] = useState<PostListItem[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const formRef = useRef(form)
 
   useEffect(() => { formRef.current = form }, [form])
@@ -54,6 +69,7 @@ export default function FullscreenEditor() {
   // Init: check auth + load categories + load post (if editing)
   // ──────────────────────────────────────────────────────────────
   useEffect(() => {
+    if (!params) return;
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.replace('/login'); return }
@@ -75,6 +91,13 @@ export default function FullscreenEditor() {
         // Set default category for new post
         setForm(f => ({ ...f, category: catList[0]?.slug || '' }))
       }
+      // Load all posts for sidebar
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('id,title,slug,category,published,updated_at')
+        .order('updated_at', { ascending: false })
+      if (posts) setAllPosts(posts)
+
       setLoading(false)
     }
     init()
@@ -174,8 +197,8 @@ export default function FullscreenEditor() {
   // ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[100] bg-cream flex items-center justify-center">
-        <div className="text-olive font-[family-name:var(--font-serif)] text-2xl animate-pulse">Loading editor...</div>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#FCFBF9', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 1 }}>
+        <div style={{ color: '#14532D', fontSize: '1.5rem' }}>Loading editor...</div>
       </div>
     )
   }
@@ -231,6 +254,74 @@ export default function FullscreenEditor() {
 
       {/* ── Main Body ── */}
       <div className="flex-1 flex overflow-hidden">
+
+        {/* ── Left Sidebar: Post List ── */}
+        {sidebarOpen && (
+          <aside className="w-[280px] border-r border-gray-200/50 bg-white shrink-0 flex flex-col overflow-hidden">
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-semibold text-olive uppercase tracking-widest">Bài viết</h3>
+                <Link href="/editor/new"
+                  className="w-7 h-7 bg-sage text-white rounded-lg flex items-center justify-center hover:bg-olive transition" title="Tạo bài mới">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                </Link>
+              </div>
+              <div className="relative">
+                <svg className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <input
+                  type="text"
+                  placeholder="Tìm bài viết..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-olive placeholder:text-gray-400 focus:outline-none focus:border-sage transition"
+                />
+              </div>
+            </div>
+            {/* Post List */}
+            <div className="flex-1 overflow-y-auto">
+              {allPosts
+                .filter(p => !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                .map(p => {
+                  const isActive = p.id === postId
+                  return (
+                    <Link key={p.id} href={`/editor/${p.id}`}
+                      className={`block px-4 py-3 border-b border-gray-50 transition ${isActive ? 'bg-[#F0FDF4] border-l-2 border-l-sage' : 'hover:bg-gray-50'}`}>
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm truncate ${isActive ? 'text-olive font-medium' : 'text-gray-700'}`}>
+                            {p.title || 'Chưa có tiêu đề'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`inline-block w-1.5 h-1.5 rounded-full ${p.published ? 'bg-sage' : 'bg-gray-300'}`} />
+                            <span className="text-[10px] text-gray-400">
+                              {p.published ? 'Đã xuất bản' : 'Nháp'}
+                            </span>
+                            {p.category && <span className="text-[10px] text-gray-400">· {p.category}</span>}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })
+              }
+              {allPosts.length === 0 && (
+                <div className="p-6 text-center text-xs text-gray-400">Chưa có bài viết nào</div>
+              )}
+            </div>
+          </aside>
+        )}
+
+        {/* Toggle sidebar button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="w-6 bg-gray-50 hover:bg-gray-100 border-r border-gray-200/50 flex items-center justify-center shrink-0 transition"
+          title={sidebarOpen ? 'Ẩn sidebar' : 'Hiện sidebar'}
+        >
+          <svg className={`w-3 h-3 text-gray-400 transition-transform ${sidebarOpen ? '' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
 
         {/* ── Editor Area ── */}
         <div className="flex-1 overflow-y-auto py-12 px-6 md:px-16">
