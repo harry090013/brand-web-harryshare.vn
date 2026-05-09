@@ -164,7 +164,7 @@ export default function FullscreenEditor() {
     if (!confirm(`Bạn chắc chắn muốn XÓA bài viết "${form.title}"?\nHành động này không thể hoàn tác!`)) return
     const { error } = await supabase.from('posts').delete().eq('id', postId)
     if (error) { alert('Lỗi khi xóa: ' + error.message); return }
-    router.replace('/admin')
+    router.replace('/editor')
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -217,9 +217,10 @@ export default function FullscreenEditor() {
       <header className="h-16 border-b border-gray-200/50 flex items-center justify-between px-8 bg-cream shrink-0">
         <div className="flex items-center gap-8">
           <Link href="/admin" className="text-2xl text-olive font-[family-name:var(--font-serif)]">Harry Share</Link>
-          <nav className="hidden md:flex gap-6 text-sm">
-            <Link href="/admin" className="text-gray-500 hover:text-olive transition">Dashboard</Link>
-            <span className="text-olive font-medium border-b border-olive pb-1">Editor</span>
+          <nav className="hidden md:flex gap-1 text-sm">
+            <Link href="/admin" className="px-3 py-1.5 rounded-lg text-gray-500 hover:text-olive hover:bg-white transition">Dashboard</Link>
+            <Link href="/editor" className="px-3 py-1.5 rounded-lg text-gray-500 hover:text-olive hover:bg-white transition">Quản lý bài</Link>
+            <span className="px-3 py-1.5 rounded-lg bg-white text-olive font-medium shadow-sm">Editor</span>
           </nav>
         </div>
         <div className="flex items-center gap-3">

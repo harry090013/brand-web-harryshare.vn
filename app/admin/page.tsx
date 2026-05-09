@@ -86,15 +86,15 @@ export default function AdminDashboard() {
 
       {/* ── Quick Actions ── */}
       <div className="grid md:grid-cols-3 gap-4 mb-10">
-        <Link href="/editor/new" className="bg-cream border border-gray-200/60 rounded-2xl p-6 group hover:shadow-sm hover:bg-white transition block">
+        <Link href="/editor" className="bg-cream border border-gray-200/60 rounded-2xl p-6 group hover:shadow-sm hover:bg-white transition block">
           <div className="flex justify-between items-start mb-6">
             <div className="w-10 h-10 bg-[#AEBFA8]/20 rounded-xl flex items-center justify-center">
               <svg className="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
             </div>
             <span className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition text-lg">→</span>
           </div>
-          <h3 className="text-xl text-olive font-[family-name:var(--font-serif)] mb-1">Viết bài mới</h3>
-          <p className="text-xs text-gray-400 leading-relaxed">Mở editor để bắt đầu viết bài mới.</p>
+          <h3 className="text-xl text-olive font-[family-name:var(--font-serif)] mb-1">Quản lý bài viết</h3>
+          <p className="text-xs text-gray-400 leading-relaxed">Xem, sửa, xóa và tạo bài viết mới.</p>
         </Link>
 
         <Link href="/admin/categories" className="bg-cream border border-gray-200/60 rounded-2xl p-6 group hover:shadow-sm hover:bg-white transition block">
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── Floating Add Button ── */}
-      <Link href="/editor/new"
+      <Link href="/editor"
         className="fixed bottom-8 right-8 w-14 h-14 bg-sage text-white rounded-full flex items-center justify-center shadow-lg hover:bg-olive transition hover:scale-105 z-50"
         title="Viết bài mới">
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
