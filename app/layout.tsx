@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import type { ReactNode } from 'react'
 import Navbar from '../components/Navbar'
 import Link from 'next/link'
+import Image from 'next/image'
 import ZenWidget from '../components/ZenWidget'
 import LayoutShell from '../components/LayoutShell'
 
@@ -57,7 +58,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
                   {/* Cột 1: Brand */}
                   <div className="md:col-span-2">
-                    <Link href="/" className="font-[family-name:var(--font-serif)] font-bold text-2xl text-olive mb-4 inline-block">Harry Share</Link>
+                    <Link href="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition">
+                      <Image src="/logo.png" alt="Harry Share" width={36} height={36} className="rounded-lg object-cover" />
+                      <span className="font-[family-name:var(--font-serif)] font-bold text-2xl text-olive">Harry Share</span>
+                    </Link>
                     <p className="text-gray-500 text-sm leading-relaxed max-w-sm mb-6">
                       Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ một người làm nghề thật, nói thật.
                     </p>
@@ -78,10 +82,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <div>
                     <h3 className="font-[family-name:var(--font-serif)] font-semibold text-olive mb-4">Khám phá</h3>
                     <ul className="space-y-3 text-sm text-gray-500">
-                      <li><Link href="/chia-se" className="hover:text-sage transition">Bài viết & Chia sẻ</Link></li>
+                      <li><Link href="/chia-se" className="hover:text-sage transition">Chia sẻ</Link></li>
                       <li><Link href="/san-pham-cua-toi" className="hover:text-sage transition">Sản phẩm của tôi</Link></li>
-                      <li><Link href="/san-pham-da-dung" className="hover:text-sage transition">Góc Review</Link></li>
-                      <li><Link href="/about" className="hover:text-sage transition">Tôi là ai?</Link></li>
+                      <li><Link href="/goc-review" className="hover:text-sage transition">Góc Review</Link></li>
+                      <li><Link href="/about" className="hover:text-sage transition">Tôi là Ai</Link></li>
                     </ul>
                   </div>
 
@@ -89,7 +93,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <div>
                     <h3 className="font-[family-name:var(--font-serif)] font-semibold text-olive mb-4">Hỗ trợ</h3>
                     <ul className="space-y-3 text-sm text-gray-500">
-                      <li><Link href="/lien-he" className="hover:text-sage transition">Liên hệ hợp tác</Link></li>
+                      <li><Link href="/lien-he" className="hover:text-sage transition">Liên hệ</Link></li>
                     </ul>
                   </div>
                 </div>

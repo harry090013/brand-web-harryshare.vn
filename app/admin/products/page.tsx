@@ -7,20 +7,20 @@ type Tab = 'owned' | 'affiliate'
 
 type ProductOwned = {
   id?: string; slug: string; name: string; short_desc: string;
-  content_html: string; price: number; images: string[]; published: boolean;
+  content_html: string; price: number; category: string; images: string[]; published: boolean;
 }
 
 type ProductAffiliate = {
   id?: string; slug: string; name: string; description: string;
-  affiliate_url: string; image: string; price: number; published: boolean;
+  affiliate_url: string; image: string; price: number; category: string; published: boolean;
 }
 
 const slugify = (str: string) =>
   str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd')
     .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-')
 
-const emptyOwned: ProductOwned = { slug: '', name: '', short_desc: '', content_html: '', price: 0, images: [], published: false }
-const emptyAffiliate: ProductAffiliate = { slug: '', name: '', description: '', affiliate_url: '', image: '', price: 0, published: true }
+const emptyOwned: ProductOwned = { slug: '', name: '', short_desc: '', content_html: '', price: 0, category: '', images: [], published: false }
+const emptyAffiliate: ProductAffiliate = { slug: '', name: '', description: '', affiliate_url: '', image: '', price: 0, category: '', published: true }
 
 export default function ProductsAdmin() {
   const router = useRouter()
@@ -157,6 +157,17 @@ export default function ProductsAdmin() {
                     className="w-full p-3 bg-cream border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-sage resize-none" />
                 </div>
                 <div>
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400 font-medium block mb-2">Danh mục</label>
+                  <input
+                    type="text"
+                    list="product-categories"
+                    value={editOwned.category}
+                    onChange={e => setEditOwned({ ...editOwned, category: e.target.value })}
+                    placeholder="VD: Template, Tài liệu, Khóa học..."
+                    className="w-full p-3 bg-cream border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-sage"
+                  />
+                </div>
+                <div>
                   <label className="text-[10px] uppercase tracking-widest text-gray-400 font-medium block mb-2">Giá (VNĐ)</label>
                   <input type="number" value={editOwned.price} onChange={e => setEditOwned({ ...editOwned, price: parseInt(e.target.value) || 0 })}
                     className="w-full p-3 bg-cream border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-sage" />
@@ -207,6 +218,26 @@ export default function ProductsAdmin() {
                   <label className="text-[10px] uppercase tracking-widest text-gray-400 font-medium block mb-2">Mô tả</label>
                   <textarea rows={3} value={editAffiliate.description} onChange={e => setEditAffiliate({ ...editAffiliate, description: e.target.value })}
                     className="w-full p-3 bg-cream border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-sage resize-none" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400 font-medium block mb-2">Danh mục</label>
+                  <input
+                    type="text"
+                    list="product-categories"
+                    value={editAffiliate.category}
+                    onChange={e => setEditAffiliate({ ...editAffiliate, category: e.target.value })}
+                    placeholder="VD: Công cụ, Sách, Khóa học..."
+                    className="w-full p-3 bg-cream border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-sage"
+                  />
+                  <datalist id="product-categories">
+                    <option value="Template" />
+                    <option value="Tài liệu" />
+                    <option value="Công cụ" />
+                    <option value="Sách" />
+                    <option value="Khóa học" />
+                    <option value="Phần mềm" />
+                    <option value="Thiết bị" />
+                  </datalist>
                 </div>
                 <div>
                   <label className="text-[10px] uppercase tracking-widest text-gray-400 font-medium block mb-2">Giá (VNĐ)</label>
@@ -275,17 +306,24 @@ export default function ProductsAdmin() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-olive text-sm truncate">{p.name}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">
+                      <div className="text-xs text-gray-400 mt-0.5 flex items-center gap-2 flex-wrap">
                         {p.price ? `${p.price.toLocaleString('vi-VN')} đ` : 'Miễn phí'}
-                        <span className={`ml-2 text-[9px] px-2 py-0.5 rounded-full ${p.published ? 'bg-[#E8F0E4] text-sage' : 'bg-gray-100 text-gray-500'}`}>
+                        {p.category && (
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-500 font-medium">{p.category}</span>
+                        )}
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full ${p.published ? 'bg-[#E8F0E4] text-sage' : 'bg-gray-100 text-gray-500'}`}>
                           {p.published ? 'Hiển thị' : 'Ẩn'}
                         </span>
                       </div>
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
                       <button onClick={() => {
-                        setEditingId(p.id)
-                        tab === 'owned' ? setEditOwned({ ...emptyOwned, ...p }) : setEditAffiliate({ ...emptyAffiliate, ...p })
+                      setEditingId(p.id)
+                        if (tab === 'owned') {
+                          setEditOwned({ ...emptyOwned, ...p, category: p.category || '', images: p.images || [] })
+                        } else {
+                          setEditAffiliate({ ...emptyAffiliate, ...p, category: p.category || '', image: p.image || '' })
+                        }
                       }} className="p-2 text-gray-400 hover:text-sage rounded-lg transition" title="Sửa">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                       </button>

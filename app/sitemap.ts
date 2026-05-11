@@ -11,10 +11,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ])
 
   return [
-    { url: site, lastModified: new Date() },
+    { url: `${site}/`, lastModified: new Date() },
+    { url: `${site}/about`, lastModified: new Date() },
+    { url: `${site}/lien-he`, lastModified: new Date() },
     { url: `${site}/chia-se`, lastModified: new Date() },
     { url: `${site}/san-pham-cua-toi`, lastModified: new Date() },
-    { url: `${site}/san-pham-da-dung`, lastModified: new Date() },
+    { url: `${site}/goc-review`, lastModified: new Date() },
     ...(posts || []).map(p => ({
       url: `${site}/chia-se/${p.slug}`,
       lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
@@ -24,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(p.created_at),
     })),
     ...(affiliate || []).map(p => ({
-      url: `${site}/san-pham-da-dung/${p.slug}`,
+      url: `${site}/goc-review/${p.slug}`,
       lastModified: new Date(p.created_at),
     })),
   ]

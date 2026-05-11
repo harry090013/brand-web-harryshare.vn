@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 
@@ -10,7 +11,7 @@ export default function Navbar() {
   const links = [
     { href: '/chia-se', label: 'Chia sẻ' },
     { href: '/san-pham-cua-toi', label: 'Sản phẩm của tôi' },
-    { href: '/san-pham-da-dung', label: 'Góc Review' },
+    { href: '/goc-review', label: 'Góc Review' },
     { href: '/about', label: 'Tôi là Ai' },
     { href: '/lien-he', label: 'Liên hệ' },
   ]
@@ -18,7 +19,10 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="font-[family-name:var(--font-serif)] font-bold text-xl text-olive">Harry Share</Link>
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+          <Image src="/logo.png" alt="Harry Share" width={32} height={32} className="rounded-lg object-cover" priority />
+          <span className="font-[family-name:var(--font-serif)] font-bold text-xl text-olive">Harry Share</span>
+        </Link>
 
         {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -34,7 +38,7 @@ export default function Navbar() {
               </Link>
             )
           })}
-          <Link href="/admin" className="text-gray-400 hover:text-sage py-4 border-b-2 border-transparent transition ml-2">Admin</Link>
+
         </nav>
 
         {/* Mobile button */}
@@ -62,7 +66,7 @@ export default function Navbar() {
                 </Link>
               )
             })}
-            <Link href="/admin" onClick={()=>setOpen(false)} className="block px-3 py-3 text-sm text-gray-400 hover:bg-gray-50 rounded-lg transition">Admin</Link>
+
           </div>
         </div>
       )}

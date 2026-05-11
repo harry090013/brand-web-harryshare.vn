@@ -20,7 +20,7 @@ export default async function AffiliateProductDetail({ params }: { params: Promi
       {/* Header */}
       <section className="bg-cream border-b border-gray-200/50">
         <div className="max-w-4xl mx-auto px-4 py-16 lg:py-24 text-center">
-          <Link href="/san-pham-da-dung" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-gray-500 hover:text-sage transition mb-8">
+          <Link href="/goc-review" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-gray-500 hover:text-sage transition mb-8">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Tất cả Review
           </Link>

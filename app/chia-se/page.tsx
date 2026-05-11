@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import Image from 'next/image'
 import FadeIn from '@/components/FadeIn'
 
 export const revalidate = 0
@@ -60,9 +61,16 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
               return (
                 <FadeIn key={p.id} direction="up" delay={index * 150}>
                   <Link href={`/chia-se/${p.slug}`} className="group bg-white border rounded-2xl overflow-hidden hover:shadow-sm transition flex flex-col h-full">
-                    <div className="aspect-[16/10] bg-gray-100 overflow-hidden relative">
+                    <div className="bg-gray-100 overflow-hidden relative" style={{ height: '220px', width: '100%' }}>
                       {p.image ? (
-                        <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                        <Image
+                          src={p.image}
+                          alt={p.title}
+                          fill
+                          className="group-hover:scale-105 transition duration-500"
+                          style={{ objectFit: 'cover' }}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300 group-hover:scale-105 transition duration-500">
                           <svg className="w-8 h-8 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
