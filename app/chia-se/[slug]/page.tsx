@@ -7,7 +7,7 @@ import { marked } from 'marked'
 import CommentBox from '@/components/CommentBox'
 import FadeIn from '@/components/FadeIn'
 
-export const revalidate = 0
+export const revalidate = 60
 
 // ✅ FIX: params là Promise trong Next 15
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -104,7 +104,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
         </FadeIn>
 
         <aside className="space-y-6">
-          <FadeIn direction="left" delay={200}>
+          <FadeIn direction="left" delay={80}>
             <div className="bg-white rounded-2xl border p-5">
               <h3 className="font-semibold mb-4">Đọc tiếp</h3>
               <div className="space-y-4">
@@ -125,7 +125,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
             </div>
           </FadeIn>
 
-          <FadeIn direction="up" delay={300}>
+          <FadeIn direction="up" delay={120}>
             <div className="bg-white rounded-2xl border p-5 text-sm text-gray-600">
               <p>Harry Share — ghi chú nhanh khi làm sản phẩm.</p>
               <Link href="/chia-se" className="text-blue-600 hover:underline mt-2 inline-block">Xem tất cả bài →</Link>

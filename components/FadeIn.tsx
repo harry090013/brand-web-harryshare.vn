@@ -8,9 +8,12 @@ export default function FadeIn({ children, delay = 0, direction = 'up' }: { chil
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting)
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.unobserve(entry.target) // chỉ animate 1 lần, không reset
+        }
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     )
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
@@ -18,19 +21,19 @@ export default function FadeIn({ children, delay = 0, direction = 'up' }: { chil
 
   let transformClass = ''
   if (!isVisible) {
-    if (direction === 'up') transformClass = 'translate-y-10'
-    if (direction === 'down') transformClass = '-translate-y-10'
-    if (direction === 'left') transformClass = 'translate-x-10'
-    if (direction === 'right') transformClass = '-translate-x-10'
+    if (direction === 'up') transformClass = 'translate-y-6'
+    if (direction === 'down') transformClass = '-translate-y-6'
+    if (direction === 'left') transformClass = 'translate-x-6'
+    if (direction === 'right') transformClass = '-translate-x-6'
   }
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
+      className={`transition-all duration-500 ease-out ${
         isVisible ? 'opacity-100 translate-y-0 translate-x-0' : `opacity-0 ${transformClass}`
       }`}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{ transitionDelay: `${delay}ms`, willChange: 'opacity, transform' }}
     >
       {children}
     </div>

@@ -28,5 +28,5 @@ body {
 }
 
 .animate-page-in {
-  animation: page-transition 1.2s ease-out forwards;
+  animation: page-transition 0.3s ease-out forwards;
 }

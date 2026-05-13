@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import FadeIn from '@/components/FadeIn'
 
-export const revalidate = 0
+export const revalidate = 60
 const PAGE_SIZE = 9
 
 export default async function ChiaSeList({ searchParams }: { searchParams: Promise<{ cat?: string; page?: string }> }) {
@@ -59,7 +59,7 @@ export default async function ChiaSeList({ searchParams }: { searchParams: Promi
             {posts.map((p, index) => {
               const catName = catData?.find(c => c.slug === p.category)?.name || p.category
               return (
-                <FadeIn key={p.id} direction="up" delay={index * 150}>
+                <FadeIn key={p.id} direction="up" delay={index * 60}>
                   <Link href={`/chia-se/${p.slug}`} className="group bg-white border rounded-2xl overflow-hidden hover:shadow-sm transition flex flex-col h-full">
                     <div className="bg-gray-100 overflow-hidden relative" style={{ height: '220px', width: '100%' }}>
                       {p.image ? (
