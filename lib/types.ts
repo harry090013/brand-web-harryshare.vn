@@ -34,3 +34,25 @@ export type Post = {
   is_start_here: boolean
   categories?: Category | null
 }
+
+export type ResourceType = 'tool' | 'product' | 'freebie' | 'case_study'
+
+export type Resource = {
+  id: string
+  title: string
+  slug: string
+  description: string | null
+  content: string | null
+  resource_type: ResourceType
+  url: string | null
+  affiliate_url: string | null
+  image: string | null
+  is_featured: boolean
+  published: boolean
+  published_at: string | null
+  seo_title: string | null
+  seo_description: string | null
+  focus_keyword: string | null
+  created_at: string
+  updated_at: string | null
+}

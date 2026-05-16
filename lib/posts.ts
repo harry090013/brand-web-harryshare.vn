@@ -569,6 +569,7 @@ export async function getContactsForAdmin() {
 export type CommentItem = {
   id: string
   post_id: string
+  parent_id: string | null
   name: string
   email: string | null
   content: string
@@ -589,7 +590,7 @@ export async function getCommentsForAdmin() {
 
   const { data: comments, error } = await serverSupabase
     .from('comments')
-    .select('id,post_id,name,email,content,approved,created_at,reply_content,replied_at,replied_by')
+    .select('id,post_id,parent_id,name,email,content,approved,created_at,reply_content,replied_at,replied_by')
     .order('created_at', { ascending: false })
 
   if (error) {

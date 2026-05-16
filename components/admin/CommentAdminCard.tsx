@@ -62,6 +62,12 @@ export default function CommentAdminCard({
             >
               {comment.approved ? 'Đã duyệt' : 'Chờ duyệt'}
             </span>
+
+            {comment.parent_id && (
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold uppercase text-blue-700">
+                Reply
+              </span>
+            )}
           </div>
 
           <p className="mt-1 text-sm text-zinc-400">
