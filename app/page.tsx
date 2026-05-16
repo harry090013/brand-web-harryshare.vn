@@ -1,10 +1,23 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, BookOpen, Brain, Code2, Layers, PenLine, Sparkles, Wrench } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  ArrowRight,
+  BookOpen,
+  Brain,
+  Code2,
+  Layers,
+  PenLine,
+  Sparkles,
+  Wrench,
+} from 'lucide-react'
 import FadeIn from '@/components/FadeIn'
 import { buildMetadata } from '@/lib/seo'
 import { getPostUrl } from '@/lib/urls'
+import {
+  getFeaturedPost,
+  getPublishedPosts,
+  getStartHerePosts,
+} from '@/lib/posts'
 
 export const revalidate = 60
 
@@ -15,65 +28,38 @@ export const metadata = buildMetadata({
   path: '/',
 })
 
-type Post = {
-  id: string
-  title: string
-  slug: string
-  excerpt: string | null
-  image: string | null
-  published_at: string | null
-  created_at: string
-  categories?: {
-    slug: string
-  } | null
-}
-
 const topics = [
   {
     title: 'Tư duy sản phẩm',
     slug: 'tu-duy-san-pham',
     icon: Brain,
-    description: 'Cách quan sát người dùng, hiểu nhu cầu, xây MVP và biến ý tưởng thành sản phẩm nhỏ có giá trị.',
+    description:
+      'Cách quan sát người dùng, hiểu nhu cầu, xây MVP và biến ý tưởng thành sản phẩm nhỏ có giá trị.',
   },
   {
     title: 'Thương hiệu cá nhân',
     slug: 'thuong-hieu-ca-nhan',
     icon: PenLine,
-    description: 'Ghi chép về định vị bản thân, content pillar, kể chuyện cá nhân và xây dựng niềm tin.',
+    description:
+      'Ghi chép về định vị bản thân, content pillar, kể chuyện cá nhân và xây dựng niềm tin.',
   },
   {
     title: 'AI & Vibe Coding',
     slug: 'ai-vibe-coding',
     icon: Code2,
-    description: 'Cách dùng AI để viết prompt, dựng landing page, prototype và làm việc như một creative director.',
+    description:
+      'Cách dùng AI để viết prompt, dựng landing page, prototype và làm việc như một creative director.',
   },
   {
     title: 'Hành trình làm nghề',
     slug: 'hanh-trinh-lam-nghe',
     icon: Layers,
-    description: 'Những bài học thật từ phục vụ bàn, POD, code freelance, content, marketing và các lần đổi hướng.',
+    description:
+      'Những bài học thật từ phục vụ bàn, POD, code freelance, content, marketing và các lần đổi hướng.',
   },
 ]
 
-const startHere = [
-  {
-    title: 'Mình là ai và vì sao mình viết HarryShare?',
-    href: '/ve-harry',
-    label: 'Về Harry',
-  },
-  {
-    title: 'Tư duy sản phẩm là gì?',
-    href: '/tu-duy-san-pham',
-    label: 'Tư duy sản phẩm',
-  },
-  {
-    title: 'Vibe coding là gì và vì sao marketer nên quan tâm?',
-    href: '/ai-vibe-coding',
-    label: 'AI & Vibe Coding',
-  },
-]
-
-function formatDate(post: Post) {
+function formatDate(post: { published_at: string | null; created_at: string }) {
   const date = post.published_at || post.created_at
   return new Date(date).toLocaleDateString('vi-VN')
 }
@@ -84,16 +70,43 @@ function estimateReadingTime(text?: string | null) {
 }
 
 export default async function Home() {
-  const { data: posts } = await supabase
-    .from('posts')
-    .select('id,title,slug,excerpt,image,published_at,created_at,categories(slug)')
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(6)
+  const [featured, startHerePosts, latest] = await Promise.all([
+    getFeaturedPost(),
+    getStartHerePosts(3),
+    getPublishedPosts(6),
+  ])
 
-  const publishedPosts = (posts || []) as Post[]
-  const featuredPost = publishedPosts[0]
-  const latestPosts = publishedPosts.slice(1, 6)
+  const featuredPost = featured || latest[0] || null
+
+  const latestPosts = latest
+    .filter((post) => post.id !== featuredPost?.id)
+    .slice(0, 5)
+
+  // Use dynamic Start Here posts if available, otherwise fallback to static info
+  const startHereData =
+    startHerePosts.length > 0
+      ? startHerePosts.map((post) => ({
+          title: post.title,
+          href: getPostUrl(post),
+          label: post.categories?.name || 'Ghi chép',
+        }))
+      : [
+          {
+            title: 'Mình là ai và vì sao mình viết HarryShare?',
+            href: '/ve-harry',
+            label: 'Về Harry',
+          },
+          {
+            title: 'Tư duy sản phẩm là gì?',
+            href: '/tu-duy-san-pham',
+            label: 'Tư duy sản phẩm',
+          },
+          {
+            title: 'Vibe coding là gì và vì sao marketer nên quan tâm?',
+            href: '/ai-vibe-coding',
+            label: 'AI & Vibe Coding',
+          },
+        ]
 
   return (
     <main className="bg-cream text-zinc-900">
@@ -178,7 +191,7 @@ export default async function Home() {
         </FadeIn>
 
         <div className="grid gap-4 md:grid-cols-3">
-          {startHere.map((item, index) => (
+          {startHereData.map((item, index) => (
             <FadeIn key={item.title} delay={index * 80}>
               <Link
                 href={item.href}
