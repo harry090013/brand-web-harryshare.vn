@@ -1,138 +1,183 @@
-import { supabase } from '@/lib/supabase'
-import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
-import ShareBar from './share-bar'
-import LikeButton from './like-button'
-import { marked } from 'marked'
+import { notFound } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+import { CalendarDays, Clock, ArrowLeft } from 'lucide-react'
+
+import { buildMetadata } from '@/lib/seo'
+import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
+import { getPostBySlug, getRelatedPosts } from '@/lib/posts'
+import { getCategoryUrl } from '@/lib/urls'
+
+import JsonLd from '@/components/JsonLd'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import AuthorBox from '@/components/AuthorBox'
+import RelatedPosts from '@/components/RelatedPosts'
+import ArticleCTA from '@/components/ArticleCTA'
+import LikeButton from '@/components/LikeButton'
 import CommentBox from '@/components/CommentBox'
-import FadeIn from '@/components/FadeIn'
 
 export const revalidate = 60
 
-// ✅ FIX: params là Promise trong Next 15
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const { data: post } = await supabase.from('posts').select('title,excerpt,image').eq('slug', slug).single()
-  if (!post) return {}
-  return {
-    title: `${post.title} | Harry Share`,
-    description: post.excerpt || post.title,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: post.image ? [post.image] : [],
-      type: 'article',
-    },
-  }
+type PageProps = {
+  params: Promise<{
+    slug: string
+  }>
 }
 
-export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
+function formatDate(date?: string | null) {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString('vi-VN')
+}
+
+function estimateReadingTime(content?: string | null) {
+  if (!content) return 3
+
+  const words = content
+    .replace(/<[^>]+>/g, '')
+    .split(/\s+/)
+    .filter(Boolean).length
+
+  return Math.max(3, Math.ceil(words / 220))
+}
+
+export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params
+  const post = await getPostBySlug(slug)
 
-  const { data: post } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single()
+  if (!post) {
+    return buildMetadata({
+      title: 'Không tìm thấy bài viết | HarryShare',
+      description: 'Bài viết này không tồn tại hoặc đã được gỡ khỏi HarryShare.',
+      path: `/chia-se/${slug}`,
+    })
+  }
 
-  if (!post) return notFound()
+  return buildMetadata({
+    title: post.seo_title || `${post.title} | HarryShare`,
+    description: post.seo_description || post.excerpt || post.title,
+    path: `/chia-se/${post.slug}`,
+    image: post.og_image || post.cover_image || post.image,
+    type: 'article',
+    publishedTime: post.published_at || post.created_at,
+    modifiedTime: post.updated_at || post.published_at || post.created_at,
+  })
+}
 
-  const { data: related } = await supabase
-    .from('posts')
-    .select('id,title,slug,image,published_at')
-    .eq('published', true)
-    .eq('category', post.category)
-    .neq('id', post.id)
-    .order('published_at', { ascending: false })
-    .limit(3)
+export default async function PostDetailPage({ params }: PageProps) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
-  // content_html = HTML từ TinyMCE editor, content = markdown (legacy)
-  const html = post.content_html
-    ? post.content_html
-    : marked.parse(post.content || '', { breaks: true, gfm: true })
+  if (!post) {
+    notFound()
+  }
+
+  const relatedPosts = await getRelatedPosts(post)
+  const category = post.categories
+  const categoryName = category?.name || 'Ghi chép'
+  const categoryUrl = getCategoryUrl(category?.slug)
+
+  const publishedDate = post.published_at || post.created_at
+  const readingTime = post.reading_time || estimateReadingTime(post.content)
+  const coverImage = post.cover_image || post.image
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-[1fr_320px] gap-10">
+    <main className="bg-cream">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Ghi chép', url: 'https://harryshare.vn/ghi-chep' },
+          { name: categoryName, url: `https://harryshare.vn${categoryUrl}` },
+          { name: post.title, url: `https://harryshare.vn/chia-se/${post.slug}` },
+        ])}
+      />
 
-        <FadeIn direction="up">
-          <article className="bg-white rounded-2xl border p-6 md:p-8">
-            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
-              {post.category || 'Chia sẻ'}
-            </div>
+      <JsonLd data={blogPostingSchema(post)} />
 
-            <h1 className="text-2xl md:text-3xl font-bold leading-snug mb-3">
-              {post.title}
-            </h1>
+      <article className="mx-auto max-w-4xl px-4 py-12 md:py-20">
+        <Breadcrumbs
+          items={[
+            { label: 'Ghi chép', href: '/ghi-chep' },
+            { label: categoryName, href: categoryUrl },
+            { label: post.title },
+          ]}
+        />
 
-            <div className="flex items-center gap-3 text-sm text-gray-500 mb-6">
-              <span>{new Date(post.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</span>
-              {post.read_time && (
-                <>
-                  <span>•</span>
-                  <span>{post.read_time} phút đọc</span>
-                </>
-              )}
-            </div>
+        <Link
+          href="/ghi-chep"
+          className="mb-8 inline-flex items-center text-sm font-semibold text-olive transition hover:opacity-70"
+        >
+          <ArrowLeft size={16} className="mr-2" />
+          Quay lại ghi chép
+        </Link>
 
-            {post.image && (
-              <div className="mb-8 overflow-hidden rounded-xl">
-                <img src={post.image} alt={post.title} className="w-full h-auto" />
-              </div>
-            )}
+        <header>
+          <div className="mb-5 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
+            <Link
+              href={categoryUrl}
+              className="rounded-full bg-[#F0FDF4] px-3 py-1 font-semibold text-sage transition hover:bg-white"
+            >
+              {categoryName}
+            </Link>
 
-            {post.excerpt && (
-              <p className="text-gray-700 italic border-l-4 pl-4 mb-6">{post.excerpt}</p>
-            )}
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays size={16} />
+              {formatDate(publishedDate)}
+            </span>
 
-            <div
-              className="prose prose-neutral max-w-none prose-img:rounded-xl prose-a:text-blue-600 prose-headings:font-semibold prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic"
-              dangerouslySetInnerHTML={{ __html: html as string }}
+            <span className="inline-flex items-center gap-2">
+              <Clock size={16} />
+              {readingTime} phút đọc
+            </span>
+          </div>
+
+          <h1 className="font-[family-name:var(--font-serif)] text-5xl font-bold leading-[1.02] tracking-[-0.045em] text-olive md:text-7xl">
+            {post.title}
+          </h1>
+
+          {post.excerpt && (
+            <p className="mt-6 text-xl leading-9 text-zinc-600">
+              {post.excerpt}
+            </p>
+          )}
+        </header>
+
+        {coverImage && (
+          <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[2rem] border border-black/10 bg-zinc-100 shadow-xl shadow-black/5">
+            <Image
+              src={coverImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
             />
+          </div>
+        )}
 
-            <div className="mt-10 pt-6 border-t flex items-center justify-between flex-wrap gap-4">
-              <LikeButton postId={post.id} initialLikes={post.likes || 0} />
-              <ShareBar title={post.title} slug={post.slug} />
-            </div>
+        <div className="prose prose-lg prose-zinc mt-12 max-w-none prose-headings:font-[family-name:var(--font-serif)] prose-headings:tracking-[-0.025em] prose-headings:text-olive prose-a:font-semibold prose-a:text-olive prose-img:rounded-2xl prose-blockquote:border-l-sage prose-blockquote:text-zinc-600">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+          >
+            {post.content || ''}
+          </ReactMarkdown>
+        </div>
 
-            <div className="mt-12 pt-8 border-t border-gray-100">
-              <h3 className="text-xl font-[family-name:var(--font-serif)] text-olive mb-6">Bình luận</h3>
-              <CommentBox slug={post.slug} />
-            </div>
-          </article>
-        </FadeIn>
+        <div className="mt-12 flex justify-center border-y border-black/10 py-8">
+          <LikeButton slug={post.slug} />
+        </div>
 
-        <aside className="space-y-6">
-          <FadeIn direction="left" delay={80}>
-            <div className="bg-white rounded-2xl border p-5">
-              <h3 className="font-semibold mb-4">Đọc tiếp</h3>
-              <div className="space-y-4">
-                {related?.length ? related.map((r) => (
-                  <Link key={r.id} href={`/chia-se/${r.slug}`} className="flex gap-3 group">
-                    <div className="w-20 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src={r.image || 'https://placehold.co/160x128'} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium leading-snug line-clamp-2 group-hover:underline">{r.title}</h4>
-                      <p className="text-xs text-gray-500 mt-1">{new Date(r.published_at).toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' })}</p>
-                    </div>
-                  </Link>
-                )) : (
-                  <p className="text-sm text-gray-500">Chưa có bài liên quan</p>
-                )}
-              </div>
-            </div>
-          </FadeIn>
+        <AuthorBox />
 
-          <FadeIn direction="up" delay={120}>
-            <div className="bg-white rounded-2xl border p-5 text-sm text-gray-600">
-              <p>Harry Share — ghi chú nhanh khi làm sản phẩm.</p>
-              <Link href="/chia-se" className="text-blue-600 hover:underline mt-2 inline-block">Xem tất cả bài →</Link>
-            </div>
-          </FadeIn>
-        </aside>
-      </div>
-    </div>
+        <ArticleCTA />
+
+        <RelatedPosts posts={relatedPosts} />
+
+        <section className="mt-14">
+          <CommentBox slug={post.slug} />
+        </section>
+      </article>
+    </main>
   )
 }

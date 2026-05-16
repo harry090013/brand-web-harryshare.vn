@@ -1,33 +1,45 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next'
 import { supabase } from '@/lib/supabase'
 
+const baseUrl = 'https://harryshare.vn'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://harryshare.vn'
-
-  const [ { data: posts }, { data: owned }, { data: affiliate } ] = await Promise.all([
-    supabase.from('posts').select('slug, updated_at').eq('published', true),
-    supabase.from('products_owned').select('slug, created_at').eq('published', true),
-    supabase.from('products_affiliate').select('slug, created_at').eq('published', true)
-  ])
-
-  return [
-    { url: `${site}/`, lastModified: new Date() },
-    { url: `${site}/about`, lastModified: new Date() },
-    { url: `${site}/lien-he`, lastModified: new Date() },
-    { url: `${site}/chia-se`, lastModified: new Date() },
-    { url: `${site}/san-pham-cua-toi`, lastModified: new Date() },
-    { url: `${site}/goc-review`, lastModified: new Date() },
-    ...(posts || []).map(p => ({
-      url: `${site}/chia-se/${p.slug}`,
-      lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
-    })),
-    ...(owned || []).map(p => ({
-      url: `${site}/san-pham-cua-toi/${p.slug}`,
-      lastModified: new Date(p.created_at),
-    })),
-    ...(affiliate || []).map(p => ({
-      url: `${site}/goc-review/${p.slug}`,
-      lastModified: new Date(p.created_at),
-    })),
+  const staticRoutes = [
+    '',
+    '/ghi-chep',
+    '/chu-de',
+    '/tu-duy-san-pham',
+    '/thuong-hieu-ca-nhan',
+    '/ai-vibe-coding',
+    '/hanh-trinh-lam-nghe',
+    '/du-an-tai-nguyen',
+    '/du-an-tai-nguyen/san-pham',
+    '/du-an-tai-nguyen/cong-cu-minh-dung',
+    '/du-an-tai-nguyen/tai-nguyen-mien-phi',
+    '/du-an-tai-nguyen/case-study',
+    '/ve-harry',
+    '/lien-he',
   ]
+
+  const staticPages = staticRoutes.map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: (route === '' ? 'weekly' : 'monthly') as 'weekly' | 'monthly',
+    priority: route === '' ? 1 : route.includes('du-an-tai-nguyen') ? 0.7 : 0.8,
+  })) satisfies MetadataRoute.Sitemap
+
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('slug,updated_at,published_at,created_at')
+    .eq('published', true)
+
+  const postPages =
+    posts?.map((post) => ({
+      url: `${baseUrl}/chia-se/${post.slug}`,
+      lastModified: new Date(post.updated_at || post.published_at || post.created_at),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })) || []
+
+  return [...staticPages, ...postPages]
 }

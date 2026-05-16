@@ -6,6 +6,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import ZenWidget from '../components/ZenWidget'
 import LayoutShell from '../components/LayoutShell'
+import JsonLd from '@/components/JsonLd'
+import { personSchema, websiteSchema } from '@/lib/schema'
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -49,6 +51,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi" className={`${inter.variable} ${playfair.variable}`}>
       <body className={`${inter.className} bg-cream bg-dot-pattern text-olive antialiased`} suppressHydrationWarning>
+        <JsonLd data={websiteSchema()} />
+        <JsonLd data={personSchema()} />
         <ZenWidget />
         <LayoutShell
           navbar={<Navbar />}
