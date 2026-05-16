@@ -2,7 +2,7 @@
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-const HIDDEN_ROUTES = ['/editor', '/admin', '/login']
+const HIDDEN_ROUTES = ['/editor', '/admin', '/login-admin']
 
 export default function LayoutShell({
   navbar,

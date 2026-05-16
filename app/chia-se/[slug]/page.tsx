@@ -175,7 +175,7 @@ export default async function PostDetailPage({ params }: PageProps) {
         <RelatedPosts posts={relatedPosts} />
 
         <section className="mt-14">
-          <CommentBox slug={post.slug} />
+          <CommentBox postId={post.id} />
         </section>
       </article>
     </main>

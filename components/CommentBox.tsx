@@ -1,91 +1,171 @@
-"use client";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+'use client'
 
-export default function CommentBox({ slug }: { slug: string }) {
-  const [list, setList] = useState<any[]>([]);
-  const [name, setName] = useState("");
-  const [content, setContent] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
-  const load = async () => {
-    // Query bằng post_slug (mới) hoặc article_id (cũ) tùy schema thực tế
-    const { data } = await supabase
-      .from("comments")
-      .select("*")
-      .eq("post_slug", slug)
-      .eq("approved", true)
-      .order("created_at", { ascending: false });
-    setList(data || []);
-  };
+type Comment = {
+  id: string
+  name: string
+  content: string
+  created_at: string
+  reply_content: string | null
+  replied_at: string | null
+  replied_by: string | null
+}
 
-  useEffect(() => { load() }, [slug]);
+type CommentBoxProps = {
+  postId: string
+}
 
-  const submit = async (e: any) => {
-    e.preventDefault();
-    if (!name.trim() || !content.trim()) return;
-    setSubmitting(true);
+export default function CommentBox({ postId }: CommentBoxProps) {
+  const [comments, setComments] = useState<Comment[]>([])
+  const [name, setName] = useState('')
+  const [content, setContent] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
-    // Chỉ gửi post_slug, name, content (schema mới)
-    const { error } = await supabase.from("comments").insert({ post_slug: slug, name, content });
+  async function loadComments() {
+    const { data, error } = await supabase
+      .from('comments')
+      .select('id,name,content,created_at,reply_content,replied_at,replied_by')
+      .eq('post_id', postId)
+      .eq('approved', true)
+      .order('created_at', { ascending: false })
+
     if (error) {
-      alert("Có lỗi khi gửi bình luận. Vui lòng thử lại!");
-    } else {
-      setContent("");
-      setName("");
-      alert("Cảm ơn! Bình luận của bạn sẽ hiển thị sau khi được duyệt.");
+      console.error('loadComments error:', error)
+      return
     }
-    setSubmitting(false);
-  };
+
+    setComments(data || [])
+  }
+
+  useEffect(() => {
+    loadComments()
+  }, [postId])
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const cleanName = name.trim()
+    const cleanContent = content.trim()
+
+    if (!cleanName || !cleanContent) {
+      setMessage('Bạn vui lòng nhập tên và nội dung bình luận.')
+      return
+    }
+
+    setLoading(true)
+    setMessage('')
+
+    const { error } = await supabase.from('comments').insert({
+      post_id: postId,
+      name: cleanName,
+      content: cleanContent,
+      approved: false,
+    })
+
+    setLoading(false)
+
+    if (error) {
+      console.error('submitComment error:', error)
+      setMessage('Có lỗi khi gửi bình luận. Vui lòng thử lại.')
+      return
+    }
+
+    setName('')
+    setContent('')
+    setMessage('Bình luận đã được gửi và đang chờ duyệt.')
+  }
 
   return (
-    <div className="mt-16 pt-10 border-t border-gray-200">
-      <h3 className="text-2xl text-olive font-[family-name:var(--font-serif)] mb-8">Bình luận</h3>
+    <div>
+      <h2 className="font-[family-name:var(--font-serif)] text-3xl font-bold text-olive">
+        Bình luận
+      </h2>
 
-      <form onSubmit={submit} className="mb-10 space-y-3">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <input
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(event) => setName(event.target.value)}
           placeholder="Tên của bạn"
-          required
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm bg-cream focus:outline-none focus:border-sage transition"
+          className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-olive"
         />
+
         <textarea
           value={content}
-          onChange={e => setContent(e.target.value)}
-          placeholder="Viết bình luận của bạn..."
-          required
-          rows={4}
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm bg-cream focus:outline-none focus:border-sage resize-none transition"
+          onChange={(event) => setContent(event.target.value)}
+          rows={5}
+          placeholder="Viết bình luận..."
+          className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-olive"
         />
+
+        {message && (
+          <div
+            className={`rounded-xl px-4 py-3 text-sm ${
+              message.includes('đã được gửi')
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'bg-red-50 text-red-600'
+            }`}
+          >
+            {message}
+          </div>
+        )}
+
         <button
           type="submit"
-          disabled={submitting}
-          className="bg-sage text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-opacity-90 transition disabled:opacity-50"
+          disabled={loading}
+          className="rounded-xl bg-olive px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? 'Đang gửi...' : 'Gửi bình luận'}
+          {loading ? 'Đang gửi...' : 'Gửi bình luận'}
         </button>
       </form>
 
-      <div className="space-y-6">
-        {list.length === 0 && (
-          <p className="text-sm text-gray-400 italic">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
-        )}
-        {list.map(c => (
-          <div key={c.id} className="flex gap-4">
-            <div className="w-9 h-9 rounded-full bg-cream-alt flex items-center justify-center text-xs font-bold text-olive uppercase shrink-0">
-              {c.name?.charAt(0) || '?'}
-            </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-olive mb-1">{c.name}</div>
-              <div className="text-sm text-gray-600 leading-relaxed">{c.content}</div>
-              <div className="text-[10px] text-gray-400 mt-1">
-                {new Date(c.created_at).toLocaleDateString('vi-VN')}
+      <div className="mt-10 space-y-4">
+        {comments.length > 0 ? (
+          comments.map((comment) => (
+            <article
+              key={comment.id}
+              className="rounded-2xl border border-black/10 bg-white/70 p-5"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <p className="font-semibold text-zinc-900">{comment.name}</p>
+                <p className="text-xs text-zinc-400">
+                  {new Date(comment.created_at).toLocaleString('vi-VN')}
+                </p>
               </div>
-            </div>
-          </div>
-        ))}
+
+              <p className="mt-3 whitespace-pre-wrap leading-7 text-zinc-600">
+                {comment.content}
+              </p>
+
+              {comment.reply_content && (
+                <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-sm font-bold text-emerald-800">
+                      {comment.replied_by || 'Harry'} trả lời
+                    </p>
+
+                    {comment.replied_at && (
+                      <p className="text-xs text-emerald-700/70">
+                        {new Date(comment.replied_at).toLocaleString('vi-VN')}
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="mt-3 whitespace-pre-wrap leading-7 text-zinc-700">
+                    {comment.reply_content}
+                  </p>
+                </div>
+              )}
+            </article>
+          ))
+        ) : (
+          <p className="italic text-zinc-400">
+            Chưa có bình luận nào. Hãy là người đầu tiên!
+          </p>
+        )}
       </div>
     </div>
-  );
+  )
 }

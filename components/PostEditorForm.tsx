@@ -4,29 +4,39 @@ import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, Sparkles } from 'lucide-react'
 
-import type { Category } from '@/lib/types'
+import type { Category, Post } from '@/lib/types'
 import { slugify } from '@/lib/content-utils'
-import { createPost } from '@/app/admin/posts/actions'
+import { createPost, updatePost } from '@/app/admin/posts/actions'
 
 type PostEditorFormProps = {
   categories: Category[]
+  post?: Post
+  mode?: 'create' | 'edit'
 }
 
-export default function PostEditorForm({ categories }: PostEditorFormProps) {
+export default function PostEditorForm({
+  categories,
+  post,
+  mode = 'create',
+}: PostEditorFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const [title, setTitle] = useState('')
-  const [slug, setSlug] = useState('')
-  const [categoryId, setCategoryId] = useState(categories[0]?.id || '')
-  const [excerpt, setExcerpt] = useState('')
-  const [content, setContent] = useState('')
-  const [seoTitle, setSeoTitle] = useState('')
-  const [seoDescription, setSeoDescription] = useState('')
-  const [focusKeyword, setFocusKeyword] = useState('')
-  const [published, setPublished] = useState(false)
-  const [isFeatured, setIsFeatured] = useState(false)
-  const [isStartHere, setIsStartHere] = useState(false)
+  const [title, setTitle] = useState(post?.title || '')
+  const [slug, setSlug] = useState(post?.slug || '')
+  const [categoryId, setCategoryId] = useState(
+    post?.category_id || categories[0]?.id || ''
+  )
+  const [excerpt, setExcerpt] = useState(post?.excerpt || '')
+  const [content, setContent] = useState(post?.content || '')
+  const [seoTitle, setSeoTitle] = useState(post?.seo_title || '')
+  const [seoDescription, setSeoDescription] = useState(
+    post?.seo_description || ''
+  )
+  const [focusKeyword, setFocusKeyword] = useState(post?.focus_keyword || '')
+  const [published, setPublished] = useState(post?.published || false)
+  const [isFeatured, setIsFeatured] = useState(post?.is_featured || false)
+  const [isStartHere, setIsStartHere] = useState(post?.is_start_here || false)
   const [message, setMessage] = useState('')
 
   const generatedSlug = useMemo(() => {
@@ -41,7 +51,7 @@ export default function PostEditorForm({ categories }: PostEditorFormProps) {
     setMessage('')
 
     startTransition(async () => {
-      const result = await createPost({
+      const payload = {
         category_id: categoryId,
         title,
         slug: slug || generatedSlug,
@@ -53,13 +63,27 @@ export default function PostEditorForm({ categories }: PostEditorFormProps) {
         focus_keyword: focusKeyword,
         is_featured: isFeatured,
         is_start_here: isStartHere,
-      })
+      }
 
+      const result =
+        mode === 'edit' && post
+          ? await updatePost({
+              id: post.id,
+              ...payload,
+            })
+          : await createPost(payload)
+
+      console.log(result)
       setMessage(result.message)
 
       if (result.ok) {
         router.refresh()
-        router.push(`/chia-se/${result.slug}`)
+
+        if (mode === 'edit' && post) {
+          router.push('/admin/posts')
+        } else {
+          router.push(`/chia-se/${result.slug}`)
+        }
       }
     })
   }
@@ -102,7 +126,10 @@ export default function PostEditorForm({ categories }: PostEditorFormProps) {
           />
 
           <p className="mt-2 text-sm text-zinc-500">
-            URL bài viết sẽ là: <span className="font-semibold text-olive">/chia-se/{slug || generatedSlug || 'slug-bai-viet'}</span>
+            URL bài viết sẽ là:{' '}
+            <span className="font-semibold text-olive">
+              /chia-se/{slug || generatedSlug || 'slug-bai-viet'}
+            </span>
           </p>
         </div>
 
@@ -163,7 +190,7 @@ export default function PostEditorForm({ categories }: PostEditorFormProps) {
               checked={published}
               onChange={(event) => setPublished(event.target.checked)}
             />
-            Xuất bản ngay
+            Xuất bản
           </label>
 
           <label className="mt-4 flex items-center gap-3 text-sm text-zinc-700">
@@ -227,7 +254,11 @@ export default function PostEditorForm({ categories }: PostEditorFormProps) {
           className="inline-flex w-full items-center justify-center rounded-full bg-olive px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-olive/15 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={16} className="mr-2" />
-          {isPending ? 'Đang lưu...' : 'Lưu bài viết'}
+          {isPending
+            ? 'Đang lưu...'
+            : mode === 'edit'
+              ? 'Cập nhật bài viết'
+              : 'Lưu bài viết'}
         </button>
 
         {message && (
