@@ -4,6 +4,7 @@ import { ArrowRight, BookOpen, Brain, Code2, Layers, PenLine, Sparkles, Wrench }
 import { supabase } from '@/lib/supabase'
 import FadeIn from '@/components/FadeIn'
 import { buildMetadata } from '@/lib/seo'
+import { getPostUrl } from '@/lib/urls'
 
 export const revalidate = 60
 
@@ -22,6 +23,9 @@ type Post = {
   image: string | null
   published_at: string | null
   created_at: string
+  categories?: {
+    slug: string
+  } | null
 }
 
 const topics = [
@@ -82,7 +86,7 @@ function estimateReadingTime(text?: string | null) {
 export default async function Home() {
   const { data: posts } = await supabase
     .from('posts')
-    .select('id,title,slug,excerpt,image,published_at,created_at')
+    .select('id,title,slug,excerpt,image,published_at,created_at,categories(slug)')
     .eq('published', true)
     .order('created_at', { ascending: false })
     .limit(6)
@@ -258,7 +262,7 @@ export default async function Home() {
           <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
             <FadeIn>
               <Link
-                href={`/chia-se/${featuredPost.slug}`}
+                href={getPostUrl(featuredPost)}
                 className="group block overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
               >
                 <div className="relative aspect-[16/9] bg-zinc-100">
@@ -292,7 +296,7 @@ export default async function Home() {
               {latestPosts.slice(0, 4).map((post, index) => (
                 <FadeIn key={post.id} delay={index * 70}>
                   <Link
-                    href={`/chia-se/${post.slug}`}
+                    href={getPostUrl(post)}
                     className="group block rounded-3xl border border-black/10 bg-white/70 p-6 transition hover:-translate-y-1 hover:bg-white hover:shadow-xl hover:shadow-black/5"
                   >
                     <p className="text-sm text-zinc-400">{formatDate(post)}</p>

@@ -7,6 +7,7 @@ import { Save, Sparkles } from 'lucide-react'
 import type { Category, Post } from '@/lib/types'
 import { slugify } from '@/lib/content-utils'
 import { createPost, updatePost } from '@/app/admin/posts/actions'
+import { getPostUrl } from '@/lib/urls'
 
 type PostEditorFormProps = {
   categories: Category[]
@@ -42,6 +43,10 @@ export default function PostEditorForm({
   const generatedSlug = useMemo(() => {
     return slugify(title)
   }, [title])
+
+  const currentCategorySlug = useMemo(() => {
+    return categories.find((c) => c.id === categoryId)?.slug
+  }, [categories, categoryId])
 
   function handleUseGeneratedSlug() {
     setSlug(generatedSlug)
@@ -128,7 +133,9 @@ export default function PostEditorForm({
           <p className="mt-2 text-sm text-zinc-500">
             URL bài viết sẽ là:{' '}
             <span className="font-semibold text-olive">
-              /chia-se/{slug || generatedSlug || 'slug-bai-viet'}
+              {currentCategorySlug
+                ? `/${currentCategorySlug}/${slug || generatedSlug || 'slug-bai-viet'}`
+                : `/chia-se/${slug || generatedSlug || 'slug-bai-viet'}`}
             </span>
           </p>
         </div>

@@ -8,6 +8,7 @@ import ZenWidget from '../components/ZenWidget'
 import LayoutShell from '../components/LayoutShell'
 import JsonLd from '@/components/JsonLd'
 import { personSchema, websiteSchema } from '@/lib/schema'
+import { siteConfig } from '@/lib/site'
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -22,17 +23,17 @@ const playfair = Playfair_Display({
 })
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://harryshare.vn'),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Harry Share | Tư duy Sản phẩm & Thương hiệu',
-    template: '%s | Harry Share'
+    default: `${siteConfig.name} | Tư duy Sản phẩm & Thương hiệu`,
+    template: `%s | ${siteConfig.name}`
   },
-  description: 'Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ Harry.',
+  description: siteConfig.description,
   openGraph: {
-    title: 'Harry Share | Tư duy Sản phẩm & Thương hiệu',
-    description: 'Góc nhìn thực chiến về Phát triển Sản phẩm, Marketing và Xây dựng Thương hiệu cá nhân từ Harry.',
-    url: 'https://harryshare.vn',
-    siteName: 'Harry Share',
+    title: `${siteConfig.name} | Tư duy Sản phẩm & Thương hiệu`,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
     locale: 'vi_VN',
     type: 'website',
   },

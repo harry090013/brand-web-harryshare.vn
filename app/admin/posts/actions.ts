@@ -90,6 +90,7 @@ export async function createPost(input: CreatePostInput) {
   revalidatePath('/thuong-hieu-ca-nhan')
   revalidatePath('/ai-vibe-coding')
   revalidatePath('/hanh-trinh-lam-nghe')
+  revalidatePath('/chia-se') // For the listing redirect
 
   return {
     ok: true,
@@ -215,11 +216,11 @@ export async function updatePost(input: UpdatePostInput) {
   revalidatePath('/admin/posts')
   revalidatePath(`/admin/posts/${input.id}/edit`)
   revalidatePath('/ghi-chep')
-  revalidatePath(`/chia-se/${slug}`)
   revalidatePath('/tu-duy-san-pham')
   revalidatePath('/thuong-hieu-ca-nhan')
   revalidatePath('/ai-vibe-coding')
   revalidatePath('/hanh-trinh-lam-nghe')
+  revalidatePath('/chia-se')
 
   return {
     ok: true,

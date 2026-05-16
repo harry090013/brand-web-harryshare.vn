@@ -1,6 +1,18 @@
 import type { Post } from '@/lib/types'
 
-export function getPostUrl(post: Pick<Post, 'slug'>) {
+export function getPostUrl(
+  post: Pick<Post, 'slug' | 'categories'>
+) {
+  const categorySlug = post.categories?.slug
+
+  if (!categorySlug) {
+    return `/chia-se/${post.slug}`
+  }
+
+  return `/${categorySlug}/${post.slug}`
+}
+
+export function getLegacyPostUrl(post: Pick<Post, 'slug'>) {
   return `/chia-se/${post.slug}`
 }
 

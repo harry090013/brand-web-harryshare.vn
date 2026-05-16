@@ -1,18 +1,19 @@
-const siteUrl = 'https://harryshare.vn'
+import { siteConfig } from '@/lib/site'
+
+const siteUrl = siteConfig.url
 
 export function websiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'HarryShare',
+    name: siteConfig.name,
     url: siteUrl,
-    description:
-      'HarryShare là blog cá nhân của Harry về tư duy sản phẩm, thương hiệu cá nhân, AI, vibe coding và hành trình làm nghề thực chiến.',
+    description: siteConfig.description,
     inLanguage: 'vi-VN',
     publisher: {
       '@type': 'Person',
-      name: 'Harry',
-      url: `${siteUrl}/ve-harry`,
+      name: siteConfig.author.name,
+      url: `${siteUrl}${siteConfig.author.url}`,
     },
   }
 }
@@ -53,8 +54,15 @@ export function blogPostingSchema(post: {
   published_at?: string | null
   updated_at?: string | null
   created_at?: string | null
+  categories?: {
+    slug: string
+  } | null
 }) {
-  const url = `${siteUrl}/chia-se/${post.slug}`
+  const path = post.categories?.slug
+    ? `/${post.categories.slug}/${post.slug}`
+    : `/chia-se/${post.slug}`
+
+  const url = `${siteUrl}${path}`
 
   return {
     '@context': 'https://schema.org',

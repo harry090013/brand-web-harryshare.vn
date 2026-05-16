@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next'
+import { siteConfig } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://harryshare.vn'
+  const baseUrl = siteConfig.url
 
   return {
     rules: [
@@ -11,13 +12,15 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/admin',
           '/admin/',
+          '/login',
+          '/login/',
           '/login-admin',
           '/login-admin/',
           '/editor',
           '/editor/',
           '/api',
           '/api/',
-        ]
+        ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

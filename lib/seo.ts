@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
+import { siteConfig } from '@/lib/site'
 
-const siteUrl = 'https://harryshare.vn'
-const siteName = 'HarryShare'
+const siteUrl = siteConfig.url
+const siteName = siteConfig.name
 const defaultImage = '/og-default.jpg'
 
 type BuildMetadataProps = {
@@ -49,10 +50,10 @@ export function buildMetadata({
       ],
       ...(type === 'article'
         ? {
-          publishedTime: publishedTime || undefined,
-          modifiedTime: modifiedTime || undefined,
-          authors: ['Harry'],
-        }
+            publishedTime: publishedTime || undefined,
+            modifiedTime: modifiedTime || undefined,
+            authors: ['Harry'],
+          }
         : {}),
     },
     twitter: {
