@@ -78,7 +78,6 @@ export default function PostEditorForm({
             })
           : await createPost(payload)
 
-      console.log(result)
       setMessage(result.message)
 
       if (result.ok) {

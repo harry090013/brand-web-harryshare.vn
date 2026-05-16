@@ -1,7 +1,7 @@
 'use client'
 import { usePathname } from 'next/navigation'
 
-const SKIP_ANIMATION = ['/editor', '/admin', '/login-admin']
+const SKIP_ANIMATION = ['/admin', '/login-admin']
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

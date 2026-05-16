@@ -598,7 +598,6 @@ export async function getCommentsForAdmin() {
     return []
   }
 
-  console.log('ADMIN COMMENTS:', comments)
 
   if (!comments || comments.length === 0) {
     return []

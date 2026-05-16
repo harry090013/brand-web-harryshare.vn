@@ -87,10 +87,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <div>
                     <h3 className="font-[family-name:var(--font-serif)] font-semibold text-olive mb-4">Khám phá</h3>
                     <ul className="space-y-3 text-sm text-gray-500">
-                      <li><Link href="/chia-se" className="hover:text-sage transition">Chia sẻ</Link></li>
-                      <li><Link href="/san-pham-cua-toi" className="hover:text-sage transition">Sản phẩm của tôi</Link></li>
-                      <li><Link href="/goc-review" className="hover:text-sage transition">Góc Review</Link></li>
-                      <li><Link href="/about" className="hover:text-sage transition">Tôi là Ai</Link></li>
+                      <li><Link href="/ghi-chep" className="hover:text-sage transition">Ghi chép</Link></li>
+                      <li><Link href="/du-an-tai-nguyen/san-pham" className="hover:text-sage transition">Sản phẩm của tôi</Link></li>
+                      <li><Link href="/du-an-tai-nguyen/cong-cu-minh-dung" className="hover:text-sage transition">Góc Review</Link></li>
+                      <li><Link href="/ve-harry" className="hover:text-sage transition">Tôi là Ai</Link></li>
                     </ul>
                   </div>
 
