@@ -279,8 +279,8 @@ export default async function Home() {
                 className="group block overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
               >
                 <div className="relative aspect-[16/9] bg-zinc-100">
-                  {featuredPost.image ? (
-                    <Image src={featuredPost.image} alt={featuredPost.title} fill className="object-cover" />
+                  {featuredPost.cover_image || featuredPost.image ? (
+                    <Image src={featuredPost.cover_image || featuredPost.image || ''} alt={featuredPost.title} fill className="object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-[#F0FDF4] text-olive">
                       <BookOpen size={42} />
