@@ -16,7 +16,7 @@ import {
 import type { Category, Post } from '@/lib/types'
 import { slugify } from '@/lib/content-utils'
 import { createPost, updatePost } from '@/app/admin/posts/actions'
-import ImageUploader from '@/components/admin/ImageUploader'
+import CompactPostImagePanel from '@/components/admin/CompactPostImagePanel'
 
 type PostEditorFormProps = {
   categories: Category[]
@@ -123,8 +123,34 @@ export default function PostEditorForm({
     insertAtCursor(content, setContent, `[Tên link](https://example.com)`)
   }
 
+  function validateBeforeSubmit() {
+    if (!title.trim()) {
+      return 'Bạn cần nhập tiêu đề bài viết.'
+    }
+
+    if (published && !content.trim()) {
+      return 'Bạn đang chọn xuất bản, vui lòng nhập nội dung bài viết.'
+    }
+
+    if (published && !excerpt.trim()) {
+      return 'Bạn đang chọn xuất bản, nên nhập tóm tắt để hiển thị đẹp trên website.'
+    }
+
+    if (published && !categoryId) {
+      return 'Bạn cần chọn danh mục trước khi xuất bản.'
+    }
+
+    return ''
+  }
+
   function handleSubmit() {
     setMessage('')
+
+    const validationMessage = validateBeforeSubmit()
+    if (validationMessage) {
+      setMessage(validationMessage)
+      return
+    }
 
     startTransition(async () => {
       const payload = {
@@ -231,56 +257,14 @@ export default function PostEditorForm({
           />
         </div>
 
-        {/* Image Manager */}
-        <div className="rounded-[2rem] border border-black/10 bg-white/80 p-6 shadow-sm">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-zinc-700">
-                Ảnh bài viết
-              </p>
-              <p className="mt-1 text-sm text-zinc-400">
-                Upload ảnh lên Supabase Storage hoặc dán URL có sẵn. Admin chỉ preview khi cần.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleUseCoverForAll}
-              className="inline-flex items-center justify-center rounded-full bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-600"
-            >
-              Dùng cover cho tất cả
-            </button>
-          </div>
-
-          <div className="mt-5 space-y-4">
-            <ImageUploader
-              label="Cover image"
-              description="Ảnh chính hiển thị trong card và đầu bài viết."
-              value={coverImage}
-              folder="posts"
-              recommendedSize="1600 x 900px"
-              onChange={setCoverImage}
-            />
-
-            <ImageUploader
-              label="OG image"
-              description="Ảnh khi share Facebook, Zalo, LinkedIn."
-              value={ogImage}
-              folder="posts"
-              recommendedSize="1200 x 630px"
-              onChange={setOgImage}
-            />
-
-            <ImageUploader
-              label="Image fallback"
-              description="Ảnh fallback cũ. Có thể dùng chung với cover."
-              value={image}
-              folder="posts"
-              recommendedSize="1600 x 900px"
-              onChange={setImage}
-            />
-          </div>
-        </div>
+        <CompactPostImagePanel
+          image={image}
+          coverImage={coverImage}
+          ogImage={ogImage}
+          onImageChange={setImage}
+          onCoverImageChange={setCoverImage}
+          onOgImageChange={setOgImage}
+        />
 
         {/* Markdown editor */}
         <div className="rounded-[2rem] border border-black/10 bg-white/80 p-6 shadow-sm">
@@ -500,9 +484,11 @@ export default function PostEditorForm({
           <Save size={16} className="mr-2" />
           {isPending
             ? 'Đang lưu...'
-            : mode === 'edit'
-              ? 'Cập nhật bài viết'
-              : 'Lưu bài viết'}
+            : published
+              ? mode === 'edit'
+                ? 'Cập nhật bài đã xuất bản'
+                : 'Đăng bài'
+              : 'Lưu nháp'}
         </button>
 
         {message && (

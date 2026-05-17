@@ -6,11 +6,11 @@ import { requireAdmin } from '@/lib/admin-auth'
 import { estimateReadingTime, getCurrentISODate, slugify } from '@/lib/content-utils'
 
 type CreatePostInput = {
-  category_id: string
+  category_id?: string
   title: string
   slug?: string
   excerpt?: string
-  content: string
+  content?: string
   image?: string
   cover_image?: string
   og_image?: string
@@ -30,8 +30,10 @@ export async function createPost(input: CreatePostInput) {
   const supabase = await createSupabaseServerClient()
 
   const title = input.title.trim()
-  const content = input.content.trim()
+  const content = input.content?.trim() || ''
   const slug = input.slug?.trim() || slugify(title)
+
+  const isPublishing = input.published
 
   if (!title) {
     return { ok: false, message: 'Thiếu tiêu đề bài viết.' }
@@ -41,18 +43,24 @@ export async function createPost(input: CreatePostInput) {
     return { ok: false, message: 'Thiếu slug bài viết.' }
   }
 
-  if (!content) {
-    return { ok: false, message: 'Thiếu nội dung bài viết.' }
+  if (isPublishing && !content) {
+    return {
+      ok: false,
+      message: 'Bài viết đang xuất bản nên cần có nội dung.',
+    }
   }
 
-  if (!input.category_id) {
-    return { ok: false, message: 'Bạn cần chọn category.' }
+  if (isPublishing && !input.category_id) {
+    return {
+      ok: false,
+      message: 'Bài viết đang xuất bản nên cần chọn danh mục.',
+    }
   }
 
   const now = getCurrentISODate()
 
   const { error } = await supabase.from('posts').insert({
-    category_id: input.category_id,
+    category_id: input.category_id || null,
     title,
     slug,
     excerpt: input.excerpt?.trim() || null,
@@ -116,11 +124,11 @@ export async function createPost(input: CreatePostInput) {
 
 type UpdatePostInput = {
   id: string
-  category_id: string
+  category_id?: string
   title: string
   slug?: string
   excerpt?: string
-  content: string
+  content?: string
   image?: string
   cover_image?: string
   og_image?: string
@@ -140,8 +148,10 @@ export async function updatePost(input: UpdatePostInput) {
   const supabase = await createSupabaseServerClient()
 
   const title = input.title.trim()
-  const content = input.content.trim()
+  const content = input.content?.trim() || ''
   const slug = input.slug?.trim() || slugify(title)
+
+  const isPublishing = input.published
 
   if (!input.id) {
     return {
@@ -164,17 +174,17 @@ export async function updatePost(input: UpdatePostInput) {
     }
   }
 
-  if (!content) {
+  if (isPublishing && !content) {
     return {
       ok: false,
-      message: 'Thiếu nội dung bài viết.',
+      message: 'Bài viết đang xuất bản nên cần có nội dung.',
     }
   }
 
-  if (!input.category_id) {
+  if (isPublishing && !input.category_id) {
     return {
       ok: false,
-      message: 'Bạn cần chọn category.',
+      message: 'Bài viết đang xuất bản nên cần chọn danh mục.',
     }
   }
 
@@ -186,13 +196,10 @@ export async function updatePost(input: UpdatePostInput) {
     .eq('id', input.id)
     .maybeSingle()
 
-  const shouldSetPublishedAt =
-    input.published && !currentPost?.published_at
-
   const { error } = await supabase
     .from('posts')
     .update({
-      category_id: input.category_id,
+      category_id: input.category_id || null,
       title,
       slug,
       excerpt: input.excerpt?.trim() || null,
