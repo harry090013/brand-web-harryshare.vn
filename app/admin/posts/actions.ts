@@ -11,6 +11,9 @@ type CreatePostInput = {
   slug?: string
   excerpt?: string
   content: string
+  image?: string
+  cover_image?: string
+  og_image?: string
   published: boolean
   seo_title?: string
   seo_description?: string
@@ -51,9 +54,13 @@ export async function createPost(input: CreatePostInput) {
     slug,
     excerpt: input.excerpt?.trim() || null,
     content,
-    image: null,
-    cover_image: null,
-    og_image: null,
+    image: input.image?.trim() || input.cover_image?.trim() || null,
+    cover_image: input.cover_image?.trim() || input.image?.trim() || null,
+    og_image:
+      input.og_image?.trim() ||
+      input.cover_image?.trim() ||
+      input.image?.trim() ||
+      null,
     published: input.published,
     published_at: input.published ? now : null,
     seo_title: input.seo_title?.trim() || `${title} | HarryShare`,
@@ -106,6 +113,9 @@ type UpdatePostInput = {
   slug?: string
   excerpt?: string
   content: string
+  image?: string
+  cover_image?: string
+  og_image?: string
   published: boolean
   seo_title?: string
   seo_description?: string
@@ -176,6 +186,14 @@ export async function updatePost(input: UpdatePostInput) {
       slug,
       excerpt: input.excerpt?.trim() || null,
       content,
+
+      image: input.image?.trim() || input.cover_image?.trim() || null,
+      cover_image: input.cover_image?.trim() || input.image?.trim() || null,
+      og_image:
+        input.og_image?.trim() ||
+        input.cover_image?.trim() ||
+        input.image?.trim() ||
+        null,
 
       published: input.published,
       published_at: shouldSetPublishedAt
