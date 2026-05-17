@@ -62,6 +62,14 @@ export default function PostEditorForm({
   const [isFeatured, setIsFeatured] = useState(post?.is_featured || false)
   const [isStartHere, setIsStartHere] = useState(post?.is_start_here || false)
 
+  const [tagsText, setTagsText] = useState(post?.tags?.join(', ') || '')
+  const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>(
+    post?.visibility || 'public'
+  )
+  const [scheduledAt, setScheduledAt] = useState(
+    post?.scheduled_at ? post.scheduled_at.slice(0, 16) : ''
+  )
+
   const [message, setMessage] = useState('')
   const [showPreview, setShowPreview] = useState(false)
 
@@ -134,6 +142,12 @@ export default function PostEditorForm({
         focus_keyword: focusKeyword,
         is_featured: isFeatured,
         is_start_here: isStartHere,
+        tags: tagsText
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        visibility,
+        scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : null,
       }
 
       const result =
@@ -225,7 +239,7 @@ export default function PostEditorForm({
                 Ảnh bài viết
               </p>
               <p className="mt-1 text-sm text-zinc-400">
-                Upload ảnh trực tiếp lên Supabase Storage hoặc dán URL ảnh có sẵn.
+                Upload ảnh lên Supabase Storage hoặc dán URL có sẵn. Admin chỉ preview khi cần.
               </p>
             </div>
 
@@ -234,24 +248,26 @@ export default function PostEditorForm({
               onClick={handleUseCoverForAll}
               className="inline-flex items-center justify-center rounded-full bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-600"
             >
-              Dùng 1 ảnh cho tất cả
+              Dùng cover cho tất cả
             </button>
           </div>
 
-          <div className="mt-5 grid gap-5">
+          <div className="mt-5 space-y-4">
             <ImageUploader
               label="Cover image"
               description="Ảnh chính hiển thị trong card và đầu bài viết."
               value={coverImage}
               folder="posts"
+              recommendedSize="1600 x 900px"
               onChange={setCoverImage}
             />
 
             <ImageUploader
               label="OG image"
-              description="Ảnh khi share Facebook, Zalo, LinkedIn. Có thể dùng chung với cover."
+              description="Ảnh khi share Facebook, Zalo, LinkedIn."
               value={ogImage}
               folder="posts"
+              recommendedSize="1200 x 630px"
               onChange={setOgImage}
             />
 
@@ -260,6 +276,7 @@ export default function PostEditorForm({
               description="Ảnh fallback cũ. Có thể dùng chung với cover."
               value={image}
               folder="posts"
+              recommendedSize="1600 x 900px"
               onChange={setImage}
             />
           </div>
@@ -394,6 +411,49 @@ export default function PostEditorForm({
             />
             Đưa vào Start Here
           </label>
+        </div>
+
+        <div className="rounded-[2rem] border border-black/10 bg-white/80 p-6 shadow-sm">
+          <p className="text-sm font-semibold text-zinc-700">Phân phối</p>
+
+          <label className="mt-4 block text-sm text-zinc-600">
+            Tags / Hashtags
+          </label>
+          <input
+            value={tagsText}
+            onChange={(event) => setTagsText(event.target.value)}
+            placeholder="product thinking, content, ai"
+            className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
+          />
+
+          <label className="mt-4 block text-sm text-zinc-600">
+            Quyền xem
+          </label>
+          <select
+            value={visibility}
+            onChange={(event) =>
+              setVisibility(event.target.value as 'public' | 'private' | 'unlisted')
+            }
+            className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
+          >
+            <option value="public">Công khai</option>
+            <option value="unlisted">Không niêm yết</option>
+            <option value="private">Riêng tư</option>
+          </select>
+
+          <label className="mt-4 block text-sm text-zinc-600">
+            Lên lịch đăng
+          </label>
+          <input
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={(event) => setScheduledAt(event.target.value)}
+            className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
+          />
+
+          <p className="mt-3 text-xs leading-5 text-zinc-400">
+            Nếu bật “Xuất bản” và chọn thời gian, bài sẽ có published_at theo thời gian đã chọn.
+          </p>
         </div>
 
         <div className="rounded-[2rem] border border-black/10 bg-white/80 p-6 shadow-sm">

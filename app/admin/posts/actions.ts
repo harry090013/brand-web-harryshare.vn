@@ -20,6 +20,9 @@ type CreatePostInput = {
   focus_keyword?: string
   is_featured: boolean
   is_start_here: boolean
+  tags?: string[]
+  visibility?: 'public' | 'private' | 'unlisted'
+  scheduled_at?: string | null
 }
 
 export async function createPost(input: CreatePostInput) {
@@ -62,7 +65,9 @@ export async function createPost(input: CreatePostInput) {
       input.image?.trim() ||
       null,
     published: input.published,
-    published_at: input.published ? now : null,
+    published_at: input.published
+      ? input.scheduled_at || now
+      : null,
     seo_title: input.seo_title?.trim() || `${title} | HarryShare`,
     seo_description: input.seo_description?.trim() || input.excerpt?.trim() || title,
     focus_keyword: input.focus_keyword?.trim() || null,
@@ -70,6 +75,9 @@ export async function createPost(input: CreatePostInput) {
     reading_time: estimateReadingTime(content),
     is_featured: input.is_featured,
     is_start_here: input.is_start_here,
+    tags: input.tags || [],
+    visibility: input.visibility || 'public',
+    scheduled_at: input.scheduled_at || null,
   })
 
   if (error) {
@@ -122,6 +130,9 @@ type UpdatePostInput = {
   focus_keyword?: string
   is_featured: boolean
   is_start_here: boolean
+  tags?: string[]
+  visibility?: 'public' | 'private' | 'unlisted'
+  scheduled_at?: string | null
 }
 
 export async function updatePost(input: UpdatePostInput) {
@@ -196,11 +207,9 @@ export async function updatePost(input: UpdatePostInput) {
         null,
 
       published: input.published,
-      published_at: shouldSetPublishedAt
-        ? now
-        : input.published
-          ? currentPost?.published_at || now
-          : null,
+      published_at: input.published
+        ? input.scheduled_at || currentPost?.published_at || now
+        : null,
 
       seo_title: input.seo_title?.trim() || `${title} | HarryShare`,
       seo_description:
@@ -210,6 +219,9 @@ export async function updatePost(input: UpdatePostInput) {
 
       is_featured: input.is_featured,
       is_start_here: input.is_start_here,
+      tags: input.tags || [],
+      visibility: input.visibility || 'public',
+      scheduled_at: input.scheduled_at || null,
     })
     .eq('id', input.id)
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useRef, useState, useTransition } from 'react'
-import { ImagePlus, Loader2, Upload } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Eye, ImagePlus, Loader2, Upload, X } from 'lucide-react'
 
 import { uploadMedia } from '@/app/admin/media/actions'
 import type { MediaFolder } from '@/lib/media'
@@ -12,7 +12,36 @@ type ImageUploaderProps = {
   description?: string
   value: string
   folder?: MediaFolder
+  recommendedSize?: string
   onChange: (url: string) => void
+}
+
+const MAX_FILE_SIZE = 250 * 1024
+
+function formatKb(size: number) {
+  return `${Math.round(size / 1024)}KB`
+}
+
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+    const objectUrl = URL.createObjectURL(file)
+
+    img.onload = () => {
+      resolve({
+        width: img.width,
+        height: img.height,
+      })
+      URL.revokeObjectURL(objectUrl)
+    }
+
+    img.onerror = () => {
+      reject(new Error('Không đọc được kích thước ảnh.'))
+      URL.revokeObjectURL(objectUrl)
+    }
+
+    img.src = objectUrl
+  })
 }
 
 export default function ImageUploader({
@@ -20,14 +49,38 @@ export default function ImageUploader({
   description,
   value,
   folder = 'posts',
+  recommendedSize,
   onChange,
 }: ImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [message, setMessage] = useState('')
+  const [warning, setWarning] = useState('')
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  function handleUpload(file: File) {
+  async function handleUpload(file: File) {
     setMessage('')
+    setWarning('')
+
+    if (!file.type.startsWith('image/')) {
+      setMessage('File không hợp lệ. Vui lòng chọn file ảnh.')
+      return
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setMessage(`Ảnh đang nặng ${formatKb(file.size)}, vượt giới hạn 250KB. Hãy nén ảnh rồi upload lại.`)
+      return
+    }
+
+    try {
+      const dimensions = await getImageDimensions(file)
+
+      if (recommendedSize) {
+        setWarning(`Ảnh bạn chọn có kích thước ${dimensions.width} x ${dimensions.height}px. Khuyến nghị: ${recommendedSize}.`)
+      }
+    } catch {
+      setWarning('Không đọc được kích thước ảnh, nhưng vẫn có thể thử upload.')
+    }
 
     const formData = new FormData()
     formData.append('file', file)
@@ -44,37 +97,64 @@ export default function ImageUploader({
     })
   }
 
+  const isError =
+    message &&
+    !message.includes('thành công')
+
+  const isSuccess =
+    message &&
+    message.includes('thành công')
+
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-4">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="text-sm font-bold text-zinc-800">{label}</p>
+
           {description && (
             <p className="mt-1 text-sm leading-6 text-zinc-400">
               {description}
             </p>
           )}
+
+          <p className="mt-1 text-xs text-zinc-400">
+            Tối đa 250KB. Hỗ trợ JPG, PNG, WebP.
+            {recommendedSize ? ` Khuyến nghị ${recommendedSize}.` : ''}
+          </p>
         </div>
 
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() => inputRef.current?.click()}
-          className="inline-flex shrink-0 items-center rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isPending ? (
-            <Loader2 size={14} className="mr-1 animate-spin" />
-          ) : (
-            <Upload size={14} className="mr-1" />
+        <div className="flex shrink-0 gap-2">
+          {value && (
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(!previewOpen)}
+              className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-bold text-zinc-600 hover:bg-zinc-50"
+            >
+              <Eye size={14} className="mr-1" />
+              Preview
+            </button>
           )}
-          Upload
-        </button>
+
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => inputRef.current?.click()}
+            className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPending ? (
+              <Loader2 size={14} className="mr-1 animate-spin" />
+            ) : (
+              <Upload size={14} className="mr-1" />
+            )}
+            Upload
+          </button>
+        </div>
       </div>
 
       <input
         ref={inputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
+        accept="image/png,image/jpeg,image/webp"
         className="hidden"
         onChange={(event) => {
           const file = event.target.files?.[0]
@@ -84,43 +164,71 @@ export default function ImageUploader({
         }}
       />
 
-      {value ? (
+      <div className="mt-4 flex gap-2">
+        <input
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="/posts/example.png hoặc Supabase Storage URL"
+          className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-xs text-zinc-600 outline-none transition focus:border-emerald-500"
+        />
+
+        {value && (
+          <button
+            type="button"
+            onClick={() => {
+              onChange('')
+              setMessage('')
+              setWarning('')
+              setPreviewOpen(false)
+            }}
+            className="inline-flex items-center rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs font-bold text-red-600"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {previewOpen && value && (
         <div className="relative mt-4 aspect-[16/9] overflow-hidden rounded-xl border border-black/10 bg-zinc-100">
           <Image
             src={value}
             alt={label}
             fill
             className="object-cover"
-            unoptimized
+            unoptimized={value.startsWith('http')}
           />
-        </div>
-      ) : (
-        <div className="mt-4 flex aspect-[16/9] items-center justify-center rounded-xl border border-dashed border-black/15 bg-emerald-50 text-zinc-400">
-          <div className="text-center">
-            <ImagePlus className="mx-auto" size={24} />
-            <p className="mt-2 text-sm">Chưa có ảnh</p>
-          </div>
         </div>
       )}
 
-      {value && (
-        <input
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="mt-3 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-xs text-zinc-500 outline-none transition focus:border-emerald-500"
-        />
+      {!value && (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-dashed border-black/10 bg-emerald-50 px-4 py-3 text-sm text-zinc-400">
+          <ImagePlus size={16} />
+          Chưa có ảnh.
+        </div>
+      )}
+
+      {warning && (
+        <div className="mt-3 flex gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-700">
+          <AlertCircle size={16} className="mt-0.5 shrink-0" />
+          <span>{warning}</span>
+        </div>
       )}
 
       {message && (
-        <p
-          className={`mt-3 text-sm font-semibold ${
-            message.includes('thành công')
-              ? 'text-emerald-700'
-              : 'text-red-600'
+        <div
+          className={`mt-3 flex gap-2 rounded-xl border px-4 py-3 text-sm leading-6 ${
+            isSuccess
+              ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+              : 'border-red-100 bg-red-50 text-red-600'
           }`}
         >
-          {message}
-        </p>
+          {isSuccess ? (
+            <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+          ) : (
+            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+          )}
+          <span>{message}</span>
+        </div>
       )}
     </div>
   )

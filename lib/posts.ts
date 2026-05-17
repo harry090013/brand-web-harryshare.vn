@@ -45,6 +45,9 @@ export async function getPublishedPosts(limit?: number) {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,
@@ -61,6 +64,7 @@ export async function getPublishedPosts(limit?: number) {
       )
     `)
     .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
 
@@ -102,6 +106,9 @@ export async function getFeaturedPost() {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,
@@ -118,6 +125,7 @@ export async function getFeaturedPost() {
       )
     `)
     .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .eq('is_featured', true)
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
@@ -156,6 +164,9 @@ export async function getStartHerePosts(limit = 3) {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,
@@ -172,6 +183,7 @@ export async function getStartHerePosts(limit = 3) {
       )
     `)
     .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .eq('is_start_here', true)
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
@@ -209,6 +221,9 @@ export async function getPostBySlug(slug: string) {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,
@@ -226,6 +241,7 @@ export async function getPostBySlug(slug: string) {
     `)
     .eq('slug', slug)
     .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .maybeSingle()
 
   if (error) {
@@ -260,6 +276,9 @@ export async function getPostsByCategorySlug(categorySlug: string, limit?: numbe
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories!inner (
         id,
         name,
@@ -276,6 +295,7 @@ export async function getPostsByCategorySlug(categorySlug: string, limit?: numbe
       )
     `)
     .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .eq('categories.slug', categorySlug)
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
@@ -323,6 +343,9 @@ export async function getRelatedPosts(post: Post, limit = 3) {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,
@@ -339,6 +362,7 @@ export async function getRelatedPosts(post: Post, limit = 3) {
       )
     `)
     .eq('published', true)
+    .lte('published_at', new Date().toISOString())
     .eq('category_id', post.category_id)
     .neq('id', post.id)
     .order('published_at', { ascending: false, nullsFirst: false })
@@ -481,6 +505,9 @@ export async function getRecentPostsForAdmin(limit = 8) {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,
@@ -531,6 +558,9 @@ export async function getPostById(id: string) {
       reading_time,
       is_featured,
       is_start_here,
+      tags,
+      visibility,
+      scheduled_at,
       categories (
         id,
         name,

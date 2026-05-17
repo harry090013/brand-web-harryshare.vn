@@ -34,6 +34,9 @@ export type Post = {
   reading_time: number | null
   is_featured: boolean
   is_start_here: boolean
+  tags: string[] | null
+  visibility: 'public' | 'private' | 'unlisted'
+  scheduled_at: string | null
   categories?: Category | null
 }
 
