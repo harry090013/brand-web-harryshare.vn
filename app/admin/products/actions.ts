@@ -15,6 +15,7 @@ type ResourceInput = {
   resource_type: ResourceType
   url?: string
   affiliate_url?: string
+  image?: string
   published: boolean
   is_featured: boolean
   seo_title?: string
@@ -63,8 +64,7 @@ export async function createResource(input: ResourceInput) {
     url: input.url?.trim() || null,
     affiliate_url: input.affiliate_url?.trim() || null,
 
-    // ảnh xử lý phase sau
-    image: null,
+    image: input.image?.trim() || null,
 
     published: input.published,
     published_at: input.published ? now : null,
@@ -135,6 +135,8 @@ export async function updateResource(input: ResourceInput & { id: string }) {
       resource_type: input.resource_type,
       url: input.url?.trim() || null,
       affiliate_url: input.affiliate_url?.trim() || null,
+
+      image: input.image?.trim() || null,
 
       published: input.published,
       published_at: input.published

@@ -7,6 +7,7 @@ import { Save, Sparkles } from 'lucide-react'
 import type { Resource, ResourceType } from '@/lib/types'
 import { slugify } from '@/lib/content-utils'
 import { createResource, updateResource } from '@/app/admin/products/actions'
+import ImageUploader from '@/components/admin/ImageUploader'
 
 type ResourceEditorFormProps = {
   resource?: Resource
@@ -52,6 +53,7 @@ export default function ResourceEditorForm({
   )
   const [url, setUrl] = useState(resource?.url || '')
   const [affiliateUrl, setAffiliateUrl] = useState(resource?.affiliate_url || '')
+  const [image, setImage] = useState(resource?.image || '')
   const [published, setPublished] = useState(resource?.published || false)
   const [isFeatured, setIsFeatured] = useState(resource?.is_featured || false)
   const [seoTitle, setSeoTitle] = useState(resource?.seo_title || '')
@@ -78,6 +80,7 @@ export default function ResourceEditorForm({
       resource_type: resourceType,
       url,
       affiliate_url: affiliateUrl,
+      image,
       published,
       is_featured: isFeatured,
       seo_title: seoTitle,
@@ -192,6 +195,16 @@ export default function ResourceEditorForm({
           <p className="mt-3 text-sm leading-6 text-zinc-400">
             {resourceTypes.find((type) => type.value === resourceType)?.description}
           </p>
+        </div>
+
+        <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+          <ImageUploader
+            label="Ảnh tài nguyên"
+            description="Ảnh hiển thị trong card resource và trang chi tiết."
+            value={image}
+            folder="resources"
+            onChange={setImage}
+          />
         </div>
 
         <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">

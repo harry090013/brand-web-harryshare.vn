@@ -16,6 +16,7 @@ import {
 import type { Category, Post } from '@/lib/types'
 import { slugify } from '@/lib/content-utils'
 import { createPost, updatePost } from '@/app/admin/posts/actions'
+import ImageUploader from '@/components/admin/ImageUploader'
 
 type PostEditorFormProps = {
   categories: Category[]
@@ -224,8 +225,7 @@ export default function PostEditorForm({
                 Ảnh bài viết
               </p>
               <p className="mt-1 text-sm text-zinc-400">
-                Nhập đường dẫn ảnh trong public, ví dụ:{' '}
-                <span className="font-mono">/posts/vibe-coding-la-gi-cover.png</span>
+                Upload ảnh trực tiếp lên Supabase Storage hoặc dán URL ảnh có sẵn.
               </p>
             </div>
 
@@ -238,58 +238,31 @@ export default function PostEditorForm({
             </button>
           </div>
 
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">
-                Image
-              </label>
-              <input
-                value={image}
-                onChange={(event) => setImage(event.target.value)}
-                placeholder="/posts/example-cover.png"
-                className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
-              />
-            </div>
+          <div className="mt-5 grid gap-5">
+            <ImageUploader
+              label="Cover image"
+              description="Ảnh chính hiển thị trong card và đầu bài viết."
+              value={coverImage}
+              folder="posts"
+              onChange={setCoverImage}
+            />
 
-            <div>
-              <label className="text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">
-                Cover image
-              </label>
-              <input
-                value={coverImage}
-                onChange={(event) => setCoverImage(event.target.value)}
-                placeholder="/posts/example-cover.png"
-                className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
-              />
-            </div>
+            <ImageUploader
+              label="OG image"
+              description="Ảnh khi share Facebook, Zalo, LinkedIn. Có thể dùng chung với cover."
+              value={ogImage}
+              folder="posts"
+              onChange={setOgImage}
+            />
 
-            <div>
-              <label className="text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">
-                OG image
-              </label>
-              <input
-                value={ogImage}
-                onChange={(event) => setOgImage(event.target.value)}
-                placeholder="/posts/example-cover.png"
-                className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
-              />
-            </div>
+            <ImageUploader
+              label="Image fallback"
+              description="Ảnh fallback cũ. Có thể dùng chung với cover."
+              value={image}
+              folder="posts"
+              onChange={setImage}
+            />
           </div>
-
-          {previewImage ? (
-            <div className="relative mt-5 aspect-[16/9] overflow-hidden rounded-3xl border border-black/10 bg-zinc-100">
-              <Image
-                src={previewImage}
-                alt={title || 'Ảnh bài viết'}
-                fill
-                className="object-cover"
-              />
-            </div>
-          ) : (
-            <div className="mt-5 rounded-3xl border border-dashed border-black/15 bg-emerald-50 p-8 text-center text-sm text-zinc-400">
-              Chưa có ảnh preview.
-            </div>
-          )}
         </div>
 
         {/* Markdown editor */}
