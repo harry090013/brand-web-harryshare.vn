@@ -69,7 +69,7 @@ export function blogPostingSchema(post: {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt || post.title,
-    image: post.og_image || post.cover_image || post.image || `${siteUrl}/og-default.jpg`,
+    image: post.og_image || post.cover_image || post.image || `${siteUrl}/og_default.png`,
     datePublished: post.published_at || post.created_at,
     dateModified: post.updated_at || post.published_at || post.created_at,
     author: {

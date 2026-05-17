@@ -3,7 +3,7 @@ import { siteConfig } from '@/lib/site'
 
 const siteUrl = siteConfig.url
 const siteName = siteConfig.name
-const defaultImage = '/og-default.jpg'
+const defaultImage = '/og_default.png'
 
 type BuildMetadataProps = {
   title: string
