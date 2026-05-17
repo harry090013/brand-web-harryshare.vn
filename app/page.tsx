@@ -152,7 +152,7 @@ export default async function Home() {
               <div className="relative overflow-hidden rounded-[2rem] border border-black/10 bg-white p-5 shadow-2xl shadow-black/10">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[1.5rem] bg-zinc-100">
                   <Image
-                    src="/harry.jpg"
+                    src="/harry_Portrait.png"
                     alt="HarryShare - Quang Hiếu"
                     fill
                     className="object-cover"

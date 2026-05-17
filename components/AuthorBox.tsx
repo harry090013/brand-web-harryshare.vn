@@ -8,7 +8,7 @@ export default function AuthorBox() {
       <div className="flex flex-col gap-6 md:flex-row md:items-center">
         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-zinc-100">
           <Image
-            src="/harry.jpg"
+            src="/harry_Portrait.png"
             alt="Harry"
             fill
             className="object-cover"
