@@ -19,6 +19,7 @@ export async function generateMetadata() {
       category?.seo_description ||
       'Ghi chép thực chiến về tư duy sản phẩm, product thinking, MVP, insight người dùng và cách biến ý tưởng thành sản phẩm nhỏ.',
     path: `/${slug}`,
+    image: category?.og_image || category?.cover_image,
   })
 }
 

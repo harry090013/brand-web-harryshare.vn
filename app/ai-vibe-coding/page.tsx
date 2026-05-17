@@ -19,6 +19,7 @@ export async function generateMetadata() {
       category?.seo_description ||
       'Ghi chép thực chiến về AI, vibe coding, Lovable, prompt tạo landing page và cách dùng AI để prototype sản phẩm.',
     path: `/${slug}`,
+    image: category?.og_image || category?.cover_image,
   })
 }
 

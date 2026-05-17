@@ -54,6 +54,8 @@ export async function getPublishedPosts(limit?: number) {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -109,6 +111,8 @@ export async function getFeaturedPost() {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -161,6 +165,8 @@ export async function getStartHerePosts(limit = 3) {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -212,6 +218,8 @@ export async function getPostBySlug(slug: string) {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -261,6 +269,8 @@ export async function getPostsByCategorySlug(categorySlug: string, limit?: numbe
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -322,6 +332,8 @@ export async function getRelatedPosts(post: Post, limit = 3) {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -353,6 +365,8 @@ export async function getCategoryBySlug(slug: string) {
       seo_description,
       pillar_intro,
       sort_order,
+      cover_image,
+      og_image,
       created_at,
       updated_at
     `)
@@ -379,6 +393,8 @@ export async function getCategories() {
       seo_description,
       pillar_intro,
       sort_order,
+      cover_image,
+      og_image,
       created_at,
       updated_at
     `)
@@ -474,6 +490,8 @@ export async function getRecentPostsForAdmin(limit = 8) {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )
@@ -522,6 +540,8 @@ export async function getPostById(id: string) {
         seo_description,
         pillar_intro,
         sort_order,
+        cover_image,
+        og_image,
         created_at,
         updated_at
       )

@@ -7,6 +7,8 @@ export type Category = {
   seo_description: string | null
   pillar_intro: string | null
   sort_order: number | null
+  cover_image: string | null
+  og_image: string | null
   created_at: string
   updated_at: string | null
 }

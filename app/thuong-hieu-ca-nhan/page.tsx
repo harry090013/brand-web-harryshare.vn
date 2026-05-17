@@ -19,6 +19,7 @@ export async function generateMetadata() {
       category?.seo_description ||
       'Ghi chép về xây dựng thương hiệu cá nhân, content pillar, định vị bản thân, kể chuyện cá nhân và tạo niềm tin.',
     path: `/${slug}`,
+    image: category?.og_image || category?.cover_image,
   })
 }
 

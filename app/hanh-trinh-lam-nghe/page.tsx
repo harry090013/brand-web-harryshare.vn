@@ -19,6 +19,7 @@ export async function generateMetadata() {
       category?.seo_description ||
       'Những ghi chép thật về đổi hướng, nghỉ việc, freelance, content, marketing và các bài học nghề nghiệp từ trải nghiệm cá nhân.',
     path: `/${slug}`,
+    image: category?.og_image || category?.cover_image,
   })
 }
 

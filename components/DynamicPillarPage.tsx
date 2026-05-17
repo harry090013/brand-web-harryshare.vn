@@ -78,6 +78,18 @@ export default function DynamicPillarPage({
               </span>
             ))}
           </div>
+
+          {category.cover_image && (
+            <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-xl shadow-black/5">
+              <Image
+                src={category.cover_image}
+                alt={category.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
         </div>
       </section>
 
