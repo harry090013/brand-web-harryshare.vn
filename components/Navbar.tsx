@@ -18,7 +18,7 @@ export default function Navbar() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-black/10 bg-[#FCFBF9]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-black/5 bg-[#FCFBF9]/85 backdrop-blur-md shadow-[0_2px_20px_rgba(0,0,0,0.01)]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 transition hover:opacity-80">
           <Image

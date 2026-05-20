@@ -1,17 +1,19 @@
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
+
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        primary: "#22c55e",
+        primary: "#5A7361",
         cream: "#FCFBF9",
-        "cream-alt": "#F0FDF4",
-        olive: "#14532D",
-        sage: "#22C55E",
+        "cream-alt": "#F3F5F3",
+        olive: "#1B3B2B",
+        sage: "#5A7361",
       }
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [typography],
 };
 export default config;

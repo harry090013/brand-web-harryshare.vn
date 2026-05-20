@@ -19,8 +19,26 @@ import RelatedPosts from '@/components/RelatedPosts'
 import ArticleCTA from '@/components/ArticleCTA'
 import LikeButton from '@/components/LikeButton'
 import CommentBox from '@/components/CommentBox'
+import ReadingProgressBar from '@/components/ReadingProgressBar'
+import TableOfContents from '@/components/TableOfContents'
 
 export const revalidate = 60
+
+const getTextFromChildren = (children: any): string => {
+  if (!children) return ''
+  if (typeof children === 'string') return children
+  if (Array.isArray(children)) return children.map(getTextFromChildren).join('')
+  if (children.props && children.props.children) return getTextFromChildren(children.props.children)
+  return ''
+}
+
+const sanitizeId = (text: string): string => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/g, '')
+    .replace(/\s+/g, '-')
+}
 
 type PageProps = {
   params: Promise<{
@@ -110,7 +128,9 @@ export default async function CategoryPostDetailPage({ params }: PageProps) {
   const postUrl = getPostUrl(post)
 
   return (
-    <main className="bg-cream">
+    <main className="bg-cream relative">
+      <ReadingProgressBar />
+
       <JsonLd
         data={breadcrumbSchema([
           { name: 'Ghi chép', url: `${siteConfig.url}/ghi-chep` },
@@ -121,89 +141,105 @@ export default async function CategoryPostDetailPage({ params }: PageProps) {
 
       <JsonLd data={blogPostingSchema(post)} />
 
-      <article className="mx-auto max-w-4xl px-4 py-12 md:py-20">
-        <Breadcrumbs
-          items={[
-            { label: 'Ghi chép', href: '/ghi-chep' },
-            { label: categoryName, href: categoryUrl },
-            { label: post.title },
-          ]}
-        />
+      <div className="mx-auto max-w-6xl px-4 py-12 md:py-20 flex flex-col lg:flex-row gap-10 items-start">
+        <article className="flex-1 min-w-0">
+          <Breadcrumbs
+            items={[
+              { label: 'Ghi chép', href: '/ghi-chep' },
+              { label: categoryName, href: categoryUrl },
+              { label: post.title },
+            ]}
+          />
 
-        <Link
-          href="/ghi-chep"
-          className="mb-8 inline-flex items-center text-sm font-semibold text-olive transition hover:opacity-70"
-        >
-          <ArrowLeft size={16} className="mr-2" />
-          Quay lại ghi chép
-        </Link>
-
-        <header>
-          <div className="mb-5 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
-            <Link
-              href={categoryUrl}
-              className="rounded-full bg-[#F0FDF4] px-3 py-1 font-semibold text-sage transition hover:bg-white"
-            >
-              {categoryName}
-            </Link>
-
-            <span className="inline-flex items-center gap-2">
-              <CalendarDays size={16} />
-              {formatDate(publishedDate)}
-            </span>
-
-            <span className="inline-flex items-center gap-2">
-              <Clock size={16} />
-              {readingTime} phút đọc
-            </span>
-          </div>
-
-          <h1 className="font-[family-name:var(--font-serif)] text-5xl font-bold leading-[1.02] tracking-[-0.045em] text-olive md:text-7xl">
-            {post.title}
-          </h1>
-
-          {post.excerpt && (
-            <p className="mt-6 text-xl leading-9 text-zinc-600">
-              {post.excerpt}
-            </p>
-          )}
-        </header>
-
-        {coverImage && (
-          <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[2rem] border border-black/10 bg-zinc-100 shadow-xl shadow-black/5">
-            <Image
-              src={coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
-
-        <div className="prose prose-lg prose-zinc mt-12 max-w-none prose-headings:font-[family-name:var(--font-serif)] prose-headings:tracking-[-0.025em] prose-headings:text-olive prose-a:font-semibold prose-a:text-olive prose-img:rounded-2xl prose-blockquote:border-l-sage prose-blockquote:text-zinc-600">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
+          <Link
+            href="/ghi-chep"
+            className="mb-8 inline-flex items-center text-sm font-semibold text-olive transition hover:opacity-70"
           >
-            {post.content || ''}
-          </ReactMarkdown>
-        </div>
+            <ArrowLeft size={16} className="mr-2" />
+            Quay lại ghi chép
+          </Link>
 
-        <div className="mt-12 flex justify-center border-y border-black/10 py-8">
-          <LikeButton slug={post.slug} />
-        </div>
+          <header>
+            <div className="mb-5 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
+              <Link
+                href={categoryUrl}
+                className="rounded-full bg-cream-alt px-3 py-1 font-semibold text-sage transition hover:bg-white border border-black/5"
+              >
+                {categoryName}
+              </Link>
 
-        <AuthorBox />
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays size={16} />
+                {formatDate(publishedDate)}
+              </span>
 
-        <ArticleCTA />
+              <span className="inline-flex items-center gap-2">
+                <Clock size={16} />
+                {readingTime} phút đọc
+              </span>
+            </div>
 
-        <RelatedPosts posts={relatedPosts} />
+            <h1 className="font-[family-name:var(--font-serif)] text-5xl font-bold leading-[1.02] tracking-[-0.045em] text-olive md:text-7xl">
+              {post.title}
+            </h1>
 
-        <section className="mt-14">
-          <CommentBox postId={post.id} />
-        </section>
-      </article>
+            {post.excerpt && (
+              <p className="mt-6 text-xl leading-9 text-zinc-600">
+                {post.excerpt}
+              </p>
+            )}
+          </header>
+
+          {coverImage && (
+            <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[2rem] border border-black/10 bg-zinc-100 shadow-xl shadow-black/5">
+              <Image
+                src={coverImage}
+                alt={post.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
+
+          <div className="prose prose-lg prose-zinc mt-12 max-w-none prose-headings:font-[family-name:var(--font-serif)] prose-headings:tracking-[-0.025em] prose-headings:text-olive prose-a:font-semibold prose-a:text-olive prose-img:rounded-2xl prose-blockquote:border-l-sage prose-blockquote:text-zinc-600">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h2: ({ children, ...props }) => {
+                  const text = getTextFromChildren(children)
+                  const id = sanitizeId(text)
+                  return <h2 id={id} {...props} className="scroll-mt-20">{children}</h2>
+                },
+                h3: ({ children, ...props }) => {
+                  const text = getTextFromChildren(children)
+                  const id = sanitizeId(text)
+                  return <h3 id={id} {...props} className="scroll-mt-20">{children}</h3>
+                }
+              }}
+            >
+              {post.content || ''}
+            </ReactMarkdown>
+          </div>
+
+          <div className="mt-12 flex justify-center border-y border-black/10 py-8">
+            <LikeButton slug={post.slug} />
+          </div>
+
+          <AuthorBox />
+
+          <ArticleCTA />
+
+          <RelatedPosts posts={relatedPosts} />
+
+          <section className="mt-14">
+            <CommentBox postId={post.id} />
+          </section>
+        </article>
+
+        <TableOfContents content={post.content || ''} />
+      </div>
     </main>
   )
 }

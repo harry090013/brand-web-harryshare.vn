@@ -1,6 +1,7 @@
 'use client'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
+import AIAssistantWidget from '@/components/AIAssistantWidget'
 
 const HIDDEN_ROUTES = ['/admin', '/login-admin']
 
@@ -20,6 +21,7 @@ export default function LayoutShell({
     <>
       {!hide && navbar}
       <main className={hide ? '' : 'min-h-screen'}>{children}</main>
+      {!hide && <AIAssistantWidget />}
       {!hide && footer}
     </>
   )
