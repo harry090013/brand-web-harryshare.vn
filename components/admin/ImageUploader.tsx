@@ -2,7 +2,15 @@
 
 import Image from 'next/image'
 import { useRef, useState, useTransition } from 'react'
-import { AlertCircle, CheckCircle2, Eye, ImagePlus, Loader2, Upload, X } from 'lucide-react'
+import {
+  AlertCircle,
+  CheckCircle2,
+  Eye,
+  ImagePlus,
+  Loader2,
+  Upload,
+  X,
+} from 'lucide-react'
 
 import { uploadMedia } from '@/app/admin/media/actions'
 import type { MediaFolder } from '@/lib/media'
@@ -22,7 +30,9 @@ function formatKb(size: number) {
   return `${Math.round(size / 1024)}KB`
 }
 
-function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+function getImageDimensions(
+  file: File
+): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new window.Image()
     const objectUrl = URL.createObjectURL(file)
@@ -68,7 +78,9 @@ export default function ImageUploader({
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setMessage(`Ảnh đang nặng ${formatKb(file.size)}, vượt giới hạn 250KB. Hãy nén ảnh rồi upload lại.`)
+      setMessage(
+        `Ảnh đang nặng ${formatKb(file.size)}, vượt giới hạn 250KB. Hãy nén ảnh rồi upload lại.`
+      )
       return
     }
 
@@ -76,7 +88,9 @@ export default function ImageUploader({
       const dimensions = await getImageDimensions(file)
 
       if (recommendedSize) {
-        setWarning(`Ảnh bạn chọn có kích thước ${dimensions.width} x ${dimensions.height}px. Khuyến nghị: ${recommendedSize}.`)
+        setWarning(
+          `Ảnh bạn chọn có kích thước ${dimensions.width} x ${dimensions.height}px. Khuyến nghị: ${recommendedSize}.`
+        )
       }
     } catch {
       setWarning('Không đọc được kích thước ảnh, nhưng vẫn có thể thử upload.')
@@ -97,13 +111,7 @@ export default function ImageUploader({
     })
   }
 
-  const isError =
-    message &&
-    !message.includes('thành công')
-
-  const isSuccess =
-    message &&
-    message.includes('thành công')
+  const isSuccess = message && message.includes('thành công')
 
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-4">

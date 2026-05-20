@@ -6,11 +6,11 @@ import { requireAdmin } from '@/lib/admin-auth'
 import { estimateReadingTime, getCurrentISODate, slugify } from '@/lib/content-utils'
 
 type CreatePostInput = {
-  category_id?: string
+  category_id: string
   title: string
   slug?: string
   excerpt?: string
-  content?: string
+  content: string
   image?: string
   cover_image?: string
   og_image?: string
@@ -39,8 +39,8 @@ export async function createPost(input: CreatePostInput) {
     return { ok: false, message: 'Thiếu tiêu đề bài viết.' }
   }
 
-  if (!slug) {
-    return { ok: false, message: 'Thiếu slug bài viết.' }
+  if (!input.category_id) {
+    return { ok: false, message: 'Bạn cần chọn category.' }
   }
 
   if (isPublishing && !content) {
@@ -50,21 +50,21 @@ export async function createPost(input: CreatePostInput) {
     }
   }
 
-  if (isPublishing && !input.category_id) {
+  if (isPublishing && !input.excerpt?.trim()) {
     return {
       ok: false,
-      message: 'Bài viết đang xuất bản nên cần chọn danh mục.',
+      message: 'Bài viết đang xuất bản nên cần có tóm tắt.',
     }
   }
 
   const now = getCurrentISODate()
 
   const { error } = await supabase.from('posts').insert({
-    category_id: input.category_id || null,
+    category_id: input.category_id,
     title,
     slug,
     excerpt: input.excerpt?.trim() || null,
-    content,
+    content: content || '',
     image: input.image?.trim() || input.cover_image?.trim() || null,
     cover_image: input.cover_image?.trim() || input.image?.trim() || null,
     og_image:
@@ -124,11 +124,11 @@ export async function createPost(input: CreatePostInput) {
 
 type UpdatePostInput = {
   id: string
-  category_id?: string
+  category_id: string
   title: string
   slug?: string
   excerpt?: string
-  content?: string
+  content: string
   image?: string
   cover_image?: string
   og_image?: string
@@ -154,24 +154,15 @@ export async function updatePost(input: UpdatePostInput) {
   const isPublishing = input.published
 
   if (!input.id) {
-    return {
-      ok: false,
-      message: 'Thiếu ID bài viết.',
-    }
+    return { ok: false, message: 'Thiếu ID bài viết.' }
   }
 
   if (!title) {
-    return {
-      ok: false,
-      message: 'Thiếu tiêu đề bài viết.',
-    }
+    return { ok: false, message: 'Thiếu tiêu đề bài viết.' }
   }
 
-  if (!slug) {
-    return {
-      ok: false,
-      message: 'Thiếu slug bài viết.',
-    }
+  if (!input.category_id) {
+    return { ok: false, message: 'Bạn cần chọn category.' }
   }
 
   if (isPublishing && !content) {
@@ -181,10 +172,10 @@ export async function updatePost(input: UpdatePostInput) {
     }
   }
 
-  if (isPublishing && !input.category_id) {
+  if (isPublishing && !input.excerpt?.trim()) {
     return {
       ok: false,
-      message: 'Bài viết đang xuất bản nên cần chọn danh mục.',
+      message: 'Bài viết đang xuất bản nên cần có tóm tắt.',
     }
   }
 
@@ -199,11 +190,11 @@ export async function updatePost(input: UpdatePostInput) {
   const { error } = await supabase
     .from('posts')
     .update({
-      category_id: input.category_id || null,
+      category_id: input.category_id,
       title,
       slug,
       excerpt: input.excerpt?.trim() || null,
-      content,
+      content: content || '',
 
       image: input.image?.trim() || input.cover_image?.trim() || null,
       cover_image: input.cover_image?.trim() || input.image?.trim() || null,

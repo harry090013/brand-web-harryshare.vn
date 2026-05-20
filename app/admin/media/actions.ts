@@ -11,17 +11,18 @@ type UploadMediaResult = {
   path?: string
 }
 
-const MAX_FILE_SIZE = 250 * 1024 // 250KB
+const MAX_FILE_SIZE = 250 * 1024
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp']
 
 function getExtension(fileName: string) {
   return fileName.split('.').pop()?.toLowerCase() || ''
 }
 
-export async function uploadMedia(formData: FormData): Promise<UploadMediaResult> {
+export async function uploadMedia(
+  formData: FormData
+): Promise<UploadMediaResult> {
   try {
     await requireAdmin()
 
@@ -81,14 +82,16 @@ export async function uploadMedia(formData: FormData): Promise<UploadMediaResult
       if (error.message.toLowerCase().includes('row-level security')) {
         return {
           ok: false,
-          message: 'Upload bị chặn bởi quyền Storage. Kiểm tra lại policy Supabase Storage.',
+          message:
+            'Upload bị chặn bởi quyền Storage. Kiểm tra lại policy Supabase Storage.',
         }
       }
 
       if (error.message.toLowerCase().includes('bucket')) {
         return {
           ok: false,
-          message: 'Không tìm thấy bucket upload. Kiểm tra bucket harryshare-media trong Supabase.',
+          message:
+            'Không tìm thấy bucket upload. Kiểm tra bucket harryshare-media trong Supabase.',
         }
       }
 
@@ -111,7 +114,8 @@ export async function uploadMedia(formData: FormData): Promise<UploadMediaResult
 
     return {
       ok: false,
-      message: 'Có lỗi không xác định khi upload ảnh. Vui lòng đăng nhập lại admin và thử lại.',
+      message:
+        'Có lỗi không xác định khi upload ảnh. Vui lòng đăng nhập lại admin và thử lại.',
     }
   }
 }
